@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+	"ginchat/utils"
 	"time"
 	"gorm.io/gorm"
 )
@@ -22,13 +24,19 @@ type UserBasic struct {
 	DeviceInfo string // 设备信息
 }
 
-// 类方法
+// ⚠️ ==类方法
 func (table *UserBasic) TableName() string {
 	return "user_basic"
 }
 
 
-// 普通方法 => 获取用户数据
+// 🌟 普通方法 => 获取用户数据 (在 router 内定义一个 url, 然后通过 service 来调用这个 GetUserList 的 models 方法)
 func GetUserList() []*UserBasic { // UserBasic 类型指针的切片, 这里的每个元素都是指向 UserBasic 类型的指针, 这意味着可以直接修改这些指针指向的 UserBasic 对象
-	return nil
+	data := make([]*UserBasic, 10) // 创建一个切片, 用于存放要查询的 userData 数据
+	utils.DB.Find(&data) // 传入 date, 在所有数据中进行查询
+
+	for _, v := range data {
+		fmt.Println("✅ 查询到的数据为: ", v)
+	}
+	return data
 }

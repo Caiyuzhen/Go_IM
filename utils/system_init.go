@@ -2,14 +2,14 @@ package utils
 
 import (
 	"fmt"
-	"ginchat/models"
-	"github.com/spf13/viper"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+    "github.com/spf13/viper"
+	// _ "ginchat/models"
+    "gorm.io/driver/mysql"
+    "gorm.io/gorm"
 )
 
-
-var DB *gorm.DB // 定义一个全局的 db 变量, 用于接收初始化后的数据库连接
+// 🌟 定义一个全局的 db 变量, 用于接收初始化后的数据库连接
+var DB *gorm.DB  // => 在 model 层会调用到 DB 这个全局变量！
 
 
 // 应用的初始化配置
@@ -26,11 +26,12 @@ func InitConfig() { // 用 viper 读取配置文件内的流式数据
 
 
 
-// 连接数据库的初始化配置
+// 传入 【初始化配置】以连接数据库
 func InitMySQL() {
 	DB, _ = gorm.Open(mysql.Open(viper.GetString("mysql.dns")), &gorm.Config{})
-	user := models.UserBasic{}
-	DB.Find(&user)
-	fmt.Println("✅ 连接数据库成功, 数据库内的数据为: ", user)
+	// 👇 查询的动作放在 model 层的 GetUserList 方法
+	// user := models.UserBasic{}
+	// DB.Find(&user)
+	// fmt.Println("✅ 连接数据库成功, 数据库内的数据为: ", user)
 }
 
