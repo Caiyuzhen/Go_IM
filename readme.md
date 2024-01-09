@@ -20,6 +20,13 @@
 - go get github.com/spf13/viper
 
 
+## 注入测试数据
+`go run testGorm.go`
+
+
+## 启动项目
+`go run main.go`
+
 
 
 ## References

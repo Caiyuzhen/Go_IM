@@ -24,19 +24,26 @@ type UserBasic struct {
 	DeviceInfo string // 设备信息
 }
 
-// ⚠️ ==类方法
+// ⚠️ => 类方法
 func (table *UserBasic) TableName() string {
 	return "user_basic"
 }
 
 
 // 🌟 普通方法 => 获取用户数据 (在 router 内定义一个 url, 然后通过 service 来调用这个 GetUserList 的 models 方法)
-func GetUserList() []*UserBasic { // UserBasic 类型指针的切片, 这里的每个元素都是指向 UserBasic 类型的指针, 这意味着可以直接修改这些指针指向的 UserBasic 对象
+func GetUserListModel() []*UserBasic { // UserBasic 类型指针的切片, 这里的每个元素都是指向 UserBasic 类型的指针, 这意味着可以直接修改这些指针指向的 UserBasic 对象
 	data := make([]*UserBasic, 10) // 创建一个切片, 用于存放要查询的 userData 数据
-	utils.DB.Find(&data) // 传入 date, 在所有数据中进行查询
+	utils.DB.Find(&data) // 查询数据库 => 传入 date, 在所有数据中进行查询
+	// var data []*UserBasic // 创建一个空切片 => Find 函数会自动填充切片, 因此不用我们事先声明切片的长度
+	result := utils.DB.Find(&data) // 查询数据库, 传入 	&data,  &data 会存放 Find() 后的所有结果
+
+	if result.Error != nil {
+        fmt.Println("❌ 数据库查询错误: ", result.Error)
+        return nil
+    }
 
 	for _, v := range data {
-		fmt.Println("✅ 查询到的数据为: ", v)
+		fmt.Println("✅ 查询到的数据为: ", v) // 单条数据
 	}
 	return data
 }
