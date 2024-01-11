@@ -9,6 +9,7 @@ import (
     "gorm.io/gorm"
 )
 
+
 // 🌟 定义一个全局的 db 变量, 用于接收初始化后的数据库连接
 var DB *gorm.DB  // => 在 model 层会调用到 DB 这个全局变量！
 
@@ -21,6 +22,7 @@ func InitConfig() { // 用 viper 读取配置文件内的流式数据, viper 为
 	if err != nil {
 		fmt.Printf("❌ viper read config failed, err: %v\n", err)
 	}
+	fmt.Println("⚙️ 正在初始化 mySQL 的配置文件...")
 	fmt.Println("✅ viper 读取到了 config 的配置文件(数据库路由): ", viper.Get("mysql")) // 打印得到的内容 => map[dns:root:123456@tcp(127.0.0.1:3306)/ginChat?charset=utf8mb4&parseTime=True&loc=UTC]
 }
 
@@ -30,9 +32,11 @@ func InitConfig() { // 用 viper 读取配置文件内的流式数据, viper 为
 func InitMySQL() {
 	var err error
 	DB, err = gorm.Open(mysql.Open(viper.GetString("mysql.dns")), &gorm.Config{})
+	fmt.Println("⚙️ 正在连接数据库...")
 
 	if err != nil {
     fmt.Printf("❌ 数据库连接失败: %v\n", err)
+	fmt.Println("✅ 连接数据库成功")
     return
 }
 

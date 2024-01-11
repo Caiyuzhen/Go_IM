@@ -7,9 +7,8 @@ import (
 )
 
 
-func main() {
+func main() { // utils 初始化 => route => model => service => ...
 	// 初始化配置文件 ________________________________________________
-
 	utils.InitConfig() // 🔥 初始化配置文件 => 从 yml 内引入配置 !!
 	utils.InitMySQL() // 初始化数据库
 

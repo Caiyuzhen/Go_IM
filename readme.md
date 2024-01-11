@@ -18,6 +18,7 @@
 - go get gorm.io/driver/mysql 
 - go get -u github.com/gin-gonic/gin
 - go get github.com/spf13/viper
+- go get -u github.com/swaggo/swag/cd/swag
 
 
 ## 注入测试数据
