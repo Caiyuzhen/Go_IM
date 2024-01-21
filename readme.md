@@ -6,7 +6,12 @@
 - utf8mb4
 
 
+
 ## 整体安装缺失依赖
+- go mod download
+
+
+## 汇总所有 go 的依赖
 - go mod tidy
 
 
@@ -20,6 +25,12 @@
 - go get -u github.com/gin-gonic/gin
 - go get github.com/spf13/viper
 - go get -u github.com/swaggo/swag/cd/swag 
+- go get -u github.com/swaggo/swag/cmd/swag
+  - 📄 文档: https://pkg.go.dev/github.com/swaggo/gin-swagger#section-readme
+  - swag init (🔥安装 swag 后记得做这步!)
+  - go get -u github.com/swaggo/gin-swagger(🔥安装 swag 后记得做这步!)
+  - go get -u github.com/swaggo/files(🔥安装 swag 后记得做这步!)
+- go get gorm.io/gorm/logger
 
 
 ## 注入测试数据

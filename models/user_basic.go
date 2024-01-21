@@ -25,7 +25,7 @@ type UserBasic struct {
 }
 
 // ⚠️ => 类方法
-func (table *UserBasic) TableName() string {
+func (table *UserBasic) TableName() string { // 🔥 table: 这是函数中用来引用传入的 UserBasic 指针的变量名, TableName() 是一个定义在 User 结构体上的方法，返回一个 string 类型的值
 	return "user_basic"
 }
 
@@ -53,4 +53,10 @@ func GetUserListModel() []*UserBasic { // UserBasic 类型指针的切片, 这�
 		fmt.Println("✅ 查询到的单条数据为: ", v) // 单条数据
 	}
 	return userData // 返回所有数据
+}
+
+
+// 🌟 普通方法 => 新增用户
+func CreateUser(user UserBasic) *gorm.DB { // 返回 DB 数据
+	return utils.DB.Create(&user)
 }

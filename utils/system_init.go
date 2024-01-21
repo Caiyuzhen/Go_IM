@@ -2,13 +2,16 @@ package utils
 
 import (
 	"fmt"
-    "github.com/spf13/viper"
+	"log"
+	"os"
+	"time"
+	"github.com/spf13/viper"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	// _ "ginchat/models"
 	// "ginchat/models"
-    "gorm.io/driver/mysql"
-    "gorm.io/gorm"
 )
-
 
 // 🌟 定义一个全局的 db 变量, 用于接收初始化后的数据库连接
 var DB *gorm.DB  // => 在 model 层会调用到 DB 这个全局变量！
@@ -30,8 +33,20 @@ func InitConfig() { // 用 viper 读取配置文件内的流式数据, viper 为
 
 // 传入 【初始化配置】以连接数据库
 func InitMySQL() {
+	// 自定义日志模板, 打印查询数据库的 SQL 语句 => 方便调试
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io 流
+		logger.Config{
+			SlowThreshold: time.Second, // 慢 SQL 阈值, 默认是 100ms
+			LogLevel: logger.Info, // 级别
+			Colorful: true, // 是否彩色打印
+		},
+	)
 	var err error
-	DB, err = gorm.Open(mysql.Open(viper.GetString("mysql.dns")), &gorm.Config{})
+	// 打开数据库连接
+	DB, err = gorm.Open(mysql.Open(viper.GetString("mysql.dns")), &gorm.Config{
+		Logger: newLogger, // 使用自定义的日志模板
+	})
 	fmt.Println("⚙️ 正在连接数据库...")
 
 	if err != nil {
