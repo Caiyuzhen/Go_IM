@@ -17,6 +17,9 @@ func Router() *gin.Engine { // 返回值 *gin.Engin e是一个指向 Gin 框架�
 
 	router.GET("/index", service.GetIndex) // 🌟【http://localhost:8081/index】 router 内数据的处理方式放在 Server 层  =>  比如 GetIndex 方法
 	router.GET("/user/getUserList", service.UserListService) // 🌟 【http://localhost:8081/user/getUserList】 router 内数据的处理方式放在 Server 层  =>  比如 GetUserList 方法
+	router.GET("/user/createUser", service.CreateUser) // 新增用户的接口 => http://localhost:8081/user/createUser?name=Annie&password=123456&rePassword=123456'
+	router.GET("/user/deleteUser", service.DeleteUser) // 删除用户的接口 => http://localhost:8081/user/deleteUser?id=1
+	router.POST("/user/updateUser", service.UpdateUser) // 更新用户的接口 => http://localhost:8081/user/updateUser
 
 	return router
 }

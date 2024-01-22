@@ -16,7 +16,7 @@
 
 
 ## 安装库
-`GORM 是一个流行的Go语言ORM（Object-Relational Mapping，对象关系映射）库, 它提供了一种高效的方式来在Go应用程序与数据库之间进行数据交互`
+`GORM 是一个流行的 Go 语言 ORM（Object-Relational Mapping，对象关系映射）库, 它提供了一种高效的方式来在 【Go 应用程序】与【数据库】之间进行数据交互`
 `GIN 是一个用 Go (Golang) 编写的 HTTP web 框架。它具有高性能的路由器和中间件，这使您能够创建功能全面的 API 和 Web`
 `Swagger 允许你使用 YAML 或 JSON 格式来描述你的 API。这种描述被称为 Swagger 规范`
 - go get github.com/jinzhu/gorm(旧)
@@ -40,6 +40,10 @@
 ## 启动项目
 `go run main.go`
 
+
+
+## 更新 Swap 文档（每次新增接口都需要 init 一下！）
+`swag init`
 
 
 ## References

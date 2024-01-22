@@ -57,6 +57,21 @@ func GetUserListModel() []*UserBasic { // UserBasic 类型指针的切片, 这�
 
 
 // 🌟 普通方法 => 新增用户
-func CreateUser(user UserBasic) *gorm.DB { // 返回 DB 数据
+func CreateUser(user UserBasic) *gorm.DB { // 返回 DB 内新增的用户数据
 	return utils.DB.Create(&user)
+}
+
+
+// 🌟 普通方法 => 删除用户
+func DeleteUser(user UserBasic) *gorm.DB { // 返回 DB 内删除的用户数据
+	return utils.DB.Delete(&user)
+}
+
+
+// 🌟 普通方法 => 更新用户
+func UpdateUser(user UserBasic) *gorm.DB { // 返回 DB 内删除的用户数据
+	return utils.DB.Model(&user).Updates(UserBasic{
+		Name: user.Name,
+		Password: user.Password,
+	})
 }
