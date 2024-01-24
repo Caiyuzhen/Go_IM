@@ -68,7 +68,7 @@ func DeleteUser(user UserBasic) *gorm.DB { // 返回 DB 内删除的用户数据
 }
 
 
-// 🌟 普通方法 => 更新用户
+// 🌟 普通方法 => 更新用户(修改)
 func UpdateUser(user UserBasic) *gorm.DB { // 返回 DB 内删除的用户数据
 	return utils.DB.Model(&user).Updates(UserBasic{
 		Name: user.Name,

@@ -93,7 +93,7 @@ func DeleteUser(c *gin.Context) { // 处理路由的数据 => 获取用户列表
 // @Router /user/updateUser [post]
 func UpdateUser(c *gin.Context) { // 处理路由的数据 => 获取用户列表
 	user := models.UserBasic{}
-	id, err := strconv.Atoi(c.PostForm("id")) // 👈👈 将路由中的 id 参数转换为 int 类型 => Atoi 是 strconv 包的方法, 通过  PostForm 来获得数据!!
+	id, err := strconv.Atoi(c.PostForm("id")) // 👈👈 将路由中的 id 参数转换为 int 类型 => Atoi 是 strconv 包的方法, 通过 PostForm (🔥 是 Gin 库内置的方法) 来获得数据!!
 	if err != nil {
 		c.JSON(-1, gin.H {
 			"message": "❌ id 参数错误",

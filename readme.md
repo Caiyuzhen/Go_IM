@@ -31,6 +31,8 @@
   - go get -u github.com/swaggo/gin-swagger(🔥安装 swag 后记得做这步!)
   - go get -u github.com/swaggo/files(🔥安装 swag 后记得做这步!)
 - go get gorm.io/gorm/logger
+- go get github.com/thedevsaddam/govalidator 
+  - 检验账号跟密码
 
 
 ## 注入测试数据
