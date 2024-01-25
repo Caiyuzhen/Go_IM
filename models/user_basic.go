@@ -13,10 +13,11 @@ type UserBasic struct {
 	Identity string // 唯一标识
 	Name string // 用户名
 	Password string // 密码
-	Phone string // 手机号
-	Email string // 邮箱
+	Phone string `valid:"matches(^1[3-9]{1}\\d{9}$)"`// 手机号 => 使用 ValidateStruct 进行校验
+	Email string  `valid:"email"` // 邮箱 => 使用 ValidateStruct 进行校验
 	ClientIp string // 客户端 IP => 设备
 	ClientPort string // 客户端端口 => 设备
+	Salt string // 盐值 => 用于加密
 	LoginTime *time.Time // 登录时间(使用指针类型, 让默认值为空), uint64 是时间戳, 使用 time.Time 可以避免为空时默认时间为 0 的状态
 	HeartBeatTime *time.Time // 心跳时间(使用指针类型, 让默认值为空),, uint64 是时间戳,  使用 time.Time 可以避免为空时默认时间为 0 的状态
 	LogoutTime *time.Time  // 登出时间(使用指针类型, 让默认值为空),, uint64 是时间戳,  使用 time.Time 可以避免为空时默认时间为 0 的状态  || `` 为表达式, 自定义在数据库内的字段名 `gorm:"column:logOut_time" json:"logOut_time`
@@ -56,6 +57,38 @@ func GetUserListModel() []*UserBasic { // UserBasic 类型指针的切片, 这�
 }
 
 
+// 🌟 普通方法 => 用于登录
+func FindUserByNameAndPassword(name string, password string) UserBasic {
+	user := UserBasic{}
+	utils.DB.Where("name = ? and password", name, password).First(&user) // 从 DB 内找到用户名跟密码都相同的数据, 并返回, 如果返回为空则表示 ❌ 错误
+	return user
+}
+
+
+// 🌟 普通方法 => 通过【用户名】去定位到某个用户, 后续可以增加比如查询异性、同城等功能
+func FindUserByName(name string) UserBasic {  // 返回 DB 内找到的用户数据
+	user := UserBasic{}
+	utils.DB.Where("name = ?", name).First(&user) // 从 DB 内找到 name = name 的数据, 并返回, 如果返回为空则表示还没有注册这个用户
+	return user // 🔥因为传入的是【引用类型的数据】, 所以返回后都是被修改过的！
+}
+
+
+// 🌟 普通方法 => 通过【手机号】去定位到某个用户, 后续可以增加比如查询异性、同城等功能
+func FindUserByPhone(phone string) UserBasic {  // 返回 DB 内找到的用户数据
+	user := UserBasic{}
+	utils.DB.Where("phone = ?", phone).First(&user) // 从 DB 内找到 name = name 的数据, 并返回, 如果返回为空则表示还没有注册这个用户
+	return user // 🔥因为传入的是【引用类型的数据】, 所以返回后都是被修改过的！
+}
+
+
+// 🌟 普通方法 => 通过【邮箱】去定位到某个用户, 后续可以增加比如查询异性、同城等功能
+func FindUserByEmail(email string) UserBasic {  // 返回 DB 内找到的用户数据
+	user := UserBasic{}
+	utils.DB.Where("email = ?", email).First(&user) // 从 DB 内找到 name = name 的数据, 并返回, 如果返回为空则表示还没有注册这个用户
+	return user // 🔥因为传入的是【引用类型的数据】, 所以返回后都是被修改过的！
+}
+
+
 // 🌟 普通方法 => 新增用户
 func CreateUser(user UserBasic) *gorm.DB { // 返回 DB 内新增的用户数据
 	return utils.DB.Create(&user)
@@ -73,5 +106,7 @@ func UpdateUser(user UserBasic) *gorm.DB { // 返回 DB 内删除的用户数据
 	return utils.DB.Model(&user).Updates(UserBasic{
 		Name: user.Name,
 		Password: user.Password,
+		Phone: user.Phone,
+		Email: user.Email,
 	})
 }

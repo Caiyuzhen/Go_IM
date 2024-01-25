@@ -31,8 +31,9 @@
   - go get -u github.com/swaggo/gin-swagger(🔥安装 swag 后记得做这步!)
   - go get -u github.com/swaggo/files(🔥安装 swag 后记得做这步!)
 - go get gorm.io/gorm/logger
-- go get github.com/thedevsaddam/govalidator 
-  - 检验账号跟密码
+<!-- - go get github.com/thedevsaddam/govalidator  -->
+- go get github.com/asaskevich/govalidator
+  - 检验账号跟密码等格式
 
 
 ## 注入测试数据
@@ -43,8 +44,7 @@
 `go run main.go`
 
 
-
-## 更新 Swap 文档（每次新增接口都需要 init 一下！）
+## 更新 Swap 文档（🌟 每次新增接口都需要 init 一下！）
 `swag init`
 
 

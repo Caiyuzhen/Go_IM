@@ -5,7 +5,7 @@ import (
 	"ginchat/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"fmt"
+	_"fmt"
 )
 
 // 【测试】用户数据的 Model  =>  Schema
@@ -18,6 +18,7 @@ type UserBasic struct {
 	Email string // 邮箱
 	ClientIp string // 客户端 IP => 设备
 	ClientPort string // 客户端端口 => 设备
+	Salt string
 	LoginTime *time.Time // 登录时间(使用指针类型, 让默认值为空), uint64 是时间戳, 使用 time.Time 可以避免为空时默认时间为 0 的状态
 	HeartBeatTime *time.Time // 心跳时间(使用指针类型, 让默认值为空),, uint64 是时间戳,  使用 time.Time 可以避免为空时默认时间为 0 的状态
 	LogoutTime *time.Time  // 登出时间(使用指针类型, 让默认值为空),, uint64 是时间戳,  使用 time.Time 可以避免为空时默认时间为 0 的状态  || `` 为表达式, 自定义在数据库内的字段名 `gorm:"column:logOut_time" json:"logOut_time`
@@ -53,14 +54,15 @@ func main() {
 
 
 	// 读取用户 user  ————————————————————————————————————————————————————————————————————————————————————————————————
-	db.First(user, 1) // 根据整型主键查找 => 设置 id 为 1 的 user
-	fmt.Println(db.First(user, 1))
+	// db.First(user, 1) // 根据整型主键查找 => 设置 id 为 1 的 user
+	// fmt.Println(db.First(user, 1))
+
 	// db.First(user, "code = ?", "D42") // 查找 code 字段值为 D42 的记录
 
 
 
 	// 修改用户 user (更新) ————————————————————————————————————————————————————————————————————————————————————————————————
-	db.Model(user).Update("Password", 1234)
+	// db.Model(user).Update("Password", 1234)
 
 
 	// // Update - 更新多个字段
