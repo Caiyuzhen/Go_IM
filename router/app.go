@@ -20,7 +20,7 @@ func Router() *gin.Engine { // 返回值 *gin.Engin e是一个指向 Gin 框架�
 	router.GET("/user/createUser", service.CreateUser) // 新增用户的接口 => http://localhost:8081/user/createUser?name=Annie&password=123456&rePassword=123456'
 	router.GET("/user/deleteUser", service.DeleteUser) // 删除用户的接口 => http://localhost:8081/user/deleteUser?id=1
 	router.POST("/user/updateUser", service.UpdateUser) // 更新用户的接口 => http://localhost:8081/user/updateUser
-	router.POST("/user/FindUserByNameAndPassword", service.UpdateUser) // 登录的接口
+	router.POST("/user/FindUserByNameAndPassword", service.FindUserByNameAndPassword) // 用户登录的接口 => http://localhost:8081/user/FindUserByNameAndPassword?name=海绵宝宝&password=123456
 
 	return router
 }

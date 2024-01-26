@@ -1,10 +1,12 @@
 package models
 
 import (
+	"crypto/md5"
 	"fmt"
-	"time"
-	"gorm.io/gorm"
 	"ginchat/utils"
+	"time"
+
+	"gorm.io/gorm"
 )
 
 // 设计用户数据的 Model  =>  Schema
@@ -57,12 +59,6 @@ func GetUserListModel() []*UserBasic { // UserBasic 类型指针的切片, 这�
 }
 
 
-// 🌟 普通方法 => 用于登录
-func FindUserByNameAndPassword(name string, password string) UserBasic {
-	user := UserBasic{}
-	utils.DB.Where("name = ? and password", name, password).First(&user) // 从 DB 内找到用户名跟密码都相同的数据, 并返回, 如果返回为空则表示 ❌ 错误
-	return user
-}
 
 
 // 🌟 普通方法 => 通过【用户名】去定位到某个用户, 后续可以增加比如查询异性、同城等功能
@@ -109,4 +105,18 @@ func UpdateUser(user UserBasic) *gorm.DB { // 返回 DB 内删除的用户数据
 		Phone: user.Phone,
 		Email: user.Email,
 	})
+}
+
+
+// 🌟 普通方法 => 用于登录
+func FindUserByNameAndPasswordInModel(name string, password string) UserBasic {
+	user := UserBasic{}
+	utils.DB.Where("name = ? and password", name, password).First(&user) // 从 DB 内找到用户名跟密码都相同的数据, 并返回, 如果返回为空则表示 ❌ 错误
+
+	// 生成 JWT （JSON Web Tokens）鉴权 token
+	str := fmt.Sprintf("%d", time.Now().Unix())// 拿到系统时间戳
+	temp :=  utils.MD5Encode(str)// 生成加密的 token
+	utils.DB.Model(&user).Where("id = ?", user.ID).Update("identity", temp) // 当用户 id = user.ID 时, 将 identity 更新为 加密的 token
+
+	return user
 }

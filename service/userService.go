@@ -65,7 +65,9 @@ func CreateUser(c *gin.Context) { // 处理路由的数据 => 🌟 注册用户
 
 	// 如果不是密码不一致, 则将密码赋值给 user.Password
 	// user.Password = password // 简单的暴力赋值, 不安全
-	user.Password = utils.MakePassword(password, salt) // 🔥🔥🔥 调用生成加密值的方法, 传入【密码】与【盐值】来生成更安全的密码
+	user.Password = utils.MakePassword(password, salt) //【🔥🔥🔥 设置到数据库内!】调用生成加密值的方法, 传入【密码】与【盐值】来生成更安全的密码
+	user.Salt = salt //【🔥🔥🔥 设置到数据库内!】
+	
 	fmt.Println("🔐🔐🔐 加密后的密码为: ", user.Password)
 
 
@@ -160,29 +162,35 @@ func UpdateUser(c *gin.Context) { // 处理路由的数据 => 获取用户列表
 func FindUserByNameAndPassword(c *gin.Context) { // 处理用户登录的路由服务
 	data := models.UserBasic{}
 
-	name := c.Query("name") // 拿到用户名
-	password := c.Query("password")  // 拿到密码
+	userInputName := c.Query("name") // 拿到用户输入的用户名
+	userInputPwd := c.Query("password")  // 拿到用户输入的密码
 
 	// 先从数据库内找到用户
-	user := models.FindUserByName(name) 
-	if user.Identity == "" {
-		c.JSON(-1, gin.H {
+	user := models.FindUserByName(userInputName) 
+	dataBaseUserPassword := user.Password // 拿到数据库内的加密密码
+	if user.Name == "" { // 不能用 Identity 来校验, 因为 Identity 经常变
+		c.JSON(200, gin.H {
 			"message": "❌ 用户不存在!",
 		})
 		return
 	}
+	// fmt.Println("😄 找到了用户: ", user)
+	// fmt.Println("😄 用户输入的密码: ", userInputPwd)
+	// fmt.Println("😄 找到了用户的盐值: ", user.Salt)
+	// fmt.Println("😄 找到了用户的加密密码: ", dataBaseUserPassword) // user.Password 是加密后的密码
 
-	flag := utils.ValidPassword(password, user.Salt, user.Password)// 因为在数据库内的密码是加密过的, 因此这里需要解密后才能查询
+	// 👆上面通过 name 拿到用户后, 在拿到用户的【盐值】跟【密码】
+	flag := utils.ValidPassword(userInputPwd, user.Salt, dataBaseUserPassword)// user.Password 是加密后的密码, 因为在数据库内的密码是加密过的, 因此这里需要解密后才能查询
 	if !flag { // 如果密码不正确, !flag 表示 flag 为 false
-		c.JSON(-1, gin.H {
+		c.JSON(200, gin.H {
 			"message": "❌ 密码错误!",
 		})
 		return
 	}
 
 	// 解密密码
-	pwd := utils.MakePassword(password, user.Salt)
-	data = models.FindUserByNameAndPassword(name, pwd) // 🔥 需要传入解密后的密码！！
+	pwd := utils.MakePassword(userInputPwd, user.Salt)
+	data = models.FindUserByNameAndPasswordInModel(userInputName, pwd) // 🔥 需要传入解密后的密码！！
 
 	c.JSON(200, gin.H {
 		"message": data,

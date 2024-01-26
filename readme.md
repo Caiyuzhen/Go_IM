@@ -6,6 +6,10 @@
 - utf8mb4
 
 
+## 在 Navicat 中连接 mySQL 数据库
+- ginChat
+- 123456
+
 
 ## 整体安装缺失依赖
 - go mod download
