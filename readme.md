@@ -46,6 +46,7 @@
 
 ## 启动项目
 `go run main.go`
+启动后访问`http://localhost:8081/swagger/index.html`可以看到 Swagger 生成的接口文档
 
 
 ## 更新 Swap 文档（🌟 每次新增接口都需要 init 一下！）
