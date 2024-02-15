@@ -27,17 +27,22 @@
 - go get -u gorm.io/gorm(新)
 - go get gorm.io/driver/mysql 
 - go get -u github.com/gin-gonic/gin
+  - 安装后需要在 config 的 app.yml 内配置 GinChat 数据库连接信息
 - go get github.com/spf13/viper
 - go get -u github.com/swaggo/swag/cd/swag 
 - go get -u github.com/swaggo/swag/cmd/swag
-  - 📄 文档: https://pkg.go.dev/github.com/swaggo/gin-swagger#section-readme
+  - 📄 SWAG 库 文档: https://pkg.go.dev/github.com/swaggo/gin-swagger#section-readme
   - swag init (🔥安装 swag 后记得做这步!)
   - go get -u github.com/swaggo/gin-swagger(🔥安装 swag 后记得做这步!)
   - go get -u github.com/swaggo/files(🔥安装 swag 后记得做这步!)
 - go get gorm.io/gorm/logger
-<!-- - go get github.com/thedevsaddam/govalidator  -->
 - go get github.com/asaskevich/govalidator
-  - 检验账号跟密码等格式
+  - 检验账号跟密码等格式的库
+- go get github.com/redis/go-redis/v9
+  - 👍 引入百万级消息并发的缓存库, 用于缓存用户信息, 安装后需要在 config 的 app.yml 内配置 redis 的连接信息
+- go get github.com/gorilla/websocket
+  - 使用 websocket 来实现聊天功能
+- <!-- - go get github.com/thedevsaddam/govalidator  -->
 
 
 ## 注入测试数据
@@ -51,6 +56,10 @@
 
 ## 更新 Swap 文档（🌟 每次新增接口都需要 init 一下！）
 `swag init`
+
+
+## 启动 Ridis 数据库
+🌟 `cd` 到 Ridis 文件夹并 `redis-server` => 启动 Ridis 数据库
 
 
 ## References

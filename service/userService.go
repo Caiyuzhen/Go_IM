@@ -5,9 +5,13 @@ import (
 	"ginchat/models"
 	"ginchat/utils"
 	"math/rand"
+	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	// "golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 
 	// "github.com/thedevsaddam/govalidator"
 	"github.com/asaskevich/govalidator"
@@ -224,4 +228,50 @@ func FindUserByNameAndPassword(c *gin.Context) { // 处理用户登录的路由�
 		"message": "✅ 登录成功",
 		"data": data,
 	})
+}
+
+
+
+// 👇Redis 的消息通讯功能 ————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+// 防止跨域站点的伪造请求（跨域攻击 => CSRF 攻击)
+var upGrade = websocket.Upgrader {
+	CheckOrigin: func(r *http.Request) bool { // CheckOrigin 函数用于检查和验证请求的来源是否合法
+		return true
+	},
+}
+
+// 开启 WebSocket 服务的方法
+func SendMsg(ctx *gin.Context) {
+	ws, err := upGrade.Upgrade(ctx.Writer, ctx.Request, nil) // 将普通的 HTTP 请求升级为 WebSocket 请求, Upgrade 为 gorilla/websocket 包内的方法
+	if err != nil{
+		fmt.Println("❌ Http 请求升级为 WebSocket 失败: ", err)
+		return
+	}
+
+	defer func(ws *websocket.Conn) {
+		err := ws.Close()
+		if err != nil {
+			fmt.Println("❌ 关闭 WebSocket 连接失败: ", err)
+		}
+	}(ws)
+
+	MsgHandler(ws, ctx)
+}
+
+
+// 工具函数, 用于调用 utils 内操作 redis 数据库的方法 (🔥 发布消息到管道, 此时客户端就可以订阅这个方法)
+func MsgHandler(ws *websocket.Conn, ctx *gin.Context) {
+	msg, err := utils.SubMsgToRedis(ctx, utils.PublishKey)  // PublishKey 是一个管道
+	if err != nil {
+		fmt.Println("❌ 从 Redis 订阅消息失败: ", err)
+	}
+	fmt.Println("✅ 从 Redis 订阅消息成功: ", msg)
+
+
+	nowTime := time.Now().Format("2006-01-02 15:04:05") // 拿到当前的时间
+	finalMsg := fmt.Sprintf("[ws][%s]: %s", nowTime, msg) // 将时间与消息拼接起来
+	err = ws.WriteMessage(1, []byte(finalMsg)) // 🔥将消息写入到 【管道】中, 1 表示消息类型, 比如文本, 为 websocket 库内定义的 WriteMessage 方法的约定,  []byte(finalMsg) 表示消息的类型 + 内容
+	if err != nil {
+		fmt.Println("❌ 从 Redis 写入消息失败: ", err)
+	}
 }
