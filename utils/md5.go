@@ -1,5 +1,5 @@
 // 🔐 md5 来进行注册时密码的加密
-package utils
+package utils // 导出为 utils 包
 
 import (
 	"crypto/md5"

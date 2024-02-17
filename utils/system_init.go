@@ -1,4 +1,4 @@
-package utils
+package utils // 导出为 utils 包
 
 import (
 	"context"
@@ -119,17 +119,25 @@ const (
 func PublishMsgToRedis(ctx context.Context, channel string, msg string) error { // ctx 表示请求过来的东西, channel 为管道(效率更高一些), message 为消息 ｜ 返回值为 error 是因为可能会出现错误
 	// var err error
 	err := RedisDB.Publish(ctx, channel, msg).Err() // Publish() 为 redis 的发布消息的方法, Err() 为 ridis 的捕获错误的方法
+	if err != nil {
+		fmt.Println("❌ 发布消息到 Redis 的 WebSocket 失败...: ", err)
+		return err
+	}
 	fmt.Println("✅ 发布消息到 Redis 的 WebSocket 成功...: ", msg)
 	return err
 }
 
-// 订阅 Redis 消息的 WebSocket
-func SubMsgToRedis(ctx context.Context, channel string) (string, error) { // ctx 表示请求过来的东西, channel 为管道(效率更高一些), message 为消息 ｜ 返回值为订阅的【消息字符串】跟【错误】
-	sub := RedisDB.PSubscribe(ctx, channel) // 订阅消息, PSubscribe 为 rdis 的订阅消息的方法
+// 订阅 Redis 消息的 WebSocket 推送（可以打印到控制台）
+func SubMsgToRedis(ctx context.Context, channel string) (string, error) { // 🌟 ctx 表示前端请求过来的东西, channel 为管道(效率更高一些), message 为消息 ｜ 返回值为订阅的【消息字符串】跟【错误】
+	fmt.Println("👍 接收到了前端传来的 ctx: ", ctx)
+	sub := RedisDB.Subscribe(ctx, channel) // 订阅消息, Subscribe 为 rdis 的订阅消息的方法
 	msg, err := sub.ReceiveMessage(ctx) // ReceiveMessage 为 ridis 的储存订阅的消息的方法
 
+	if err != nil {
+		fmt.Println("❌ 订阅 Redis 的 WebSocket 失败...: ", err)
+		return "❌ Error", err
+	}
 	fmt.Println("✅ 订阅 Redis 的 WebSocket 成功...: ", msg.Payload)
-
 	return msg.Payload, err // 🌟 Payload 为转化为 ridis 内把【消息】转化为【字符串】的方法
 }
 

@@ -36,9 +36,11 @@ func main() {
 	}
 
 
-	// 如果没有表, 则创建一张表  =>  schema
-	db.AutoMigrate(&models.UserBasic{}) // 
-
+	// 👇 创建【用户】、【消息】、【群组】、【用户关系】几张表
+	db.AutoMigrate(&models.UserBasic{}) // 如果没有表, 则创建一张【用户】表  =>  schema
+	db.AutoMigrate(&models.MessageBasic{}) // 如果没有表, 则创建一张【消息】表  =>  schema
+	db.AutoMigrate((&models.GroupBasic{})) // 如果没有表, 则创建一张【群组】表  =>  schema
+	db.AutoMigrate((&models.ContactBasic{})) // 如果没有表, 则创建一张【用户关系】表  =>  schema
 
 	// 新增一个用户 user ————————————————————————————————————————————————————————————————————————————————————————————————
 	currentTime := time.Now() // 使用 time.Now() 获取当前时间

@@ -27,8 +27,8 @@ type UserBasic struct {
 	Salt string // 盐值 => 用于加密
 }
 
-// ⚠️ => 类方法
-func (table *UserBasic) TableName() string { // 🔥 table: 这是函数中用来引用传入的 UserBasic 指针的变量名, TableName() 是一个定义在 UserBasic 结构体上的方法，返回一个 string 类型的值
+// ⚠️ => 类方法, 从数据库中获取表名的方法
+func (table *UserBasic) TableName() string { // 🔥 table 数据表, TableName 用于指定表名: 这是函数中用来引用传入的 UserBasic 指针的变量名, TableName() 是一个定义在 UserBasic 结构体上的方法，返回一个 string 类型的值
 	return "user_basic"
 }
 

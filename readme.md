@@ -42,6 +42,7 @@
   - 👍 引入百万级消息并发的缓存库, 用于缓存用户信息, 安装后需要在 config 的 app.yml 内配置 redis 的连接信息
 - go get github.com/gorilla/websocket
   - 使用 websocket 来实现聊天功能
+- go get gopkg.in/fatih/set.v0
 - <!-- - go get github.com/thedevsaddam/govalidator  -->
 
 
@@ -49,17 +50,21 @@
 `go run testGorm.go`
 
 
+## 更新 Swap 文档（🌟 每次新增接口都需要 init 一下！）
+`swag init`
+
+
 ## 启动项目
 `go run main.go`
 启动后访问`http://localhost:8081/swagger/index.html`可以看到 Swagger 生成的接口文档
 
 
-## 更新 Swap 文档（🌟 每次新增接口都需要 init 一下！）
-`swag init`
-
-
 ## 启动 Ridis 数据库
 🌟 `cd` 到 Ridis 文件夹并 `redis-server` => 启动 Ridis 数据库
+
+
+## 在线 WebSocket 测试工具
+- https://www.easyswoole.com/wstool.html
 
 
 ## References
