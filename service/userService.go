@@ -185,12 +185,20 @@ func UpdateUser(c *gin.Context) { // 处理路由的数据 => 获取用户列表
 // @param name query string false "用户名"
 // @param password query string false "密码"
 // @Success 200 {string} json{"code", "message"}
-// @Router /user/FindUserByNameAndPassword [post]
+// @Router /user/login [post]
 func FindUserByNameAndPassword(c *gin.Context) { // 处理用户登录的路由服务
 	data := models.UserBasic{}
 
-	userInputName := c.Query("name") // 拿到用户输入的用户名
-	userInputPwd := c.Query("password")  // 拿到用户输入的密码
+	// PATH 数据
+	// userInputName := c.Query("name") // 拿到用户输入的用户名 （取出路由 PATH 形式的数据）
+	// userInputPwd := c.Query("password")  // 拿到用户输入的密码 （取出路由 PATH 形式的数据）
+
+	// FORM 数据
+	userInputName := c.Request.FormValue("name") // 拿到用户输入的用户名 (取出表单形式的数据)
+	userInputPwd := c.Request.FormValue("password") // 拿到用户输入的密码 (取出表单形式的数据)
+
+
+	fmt.Println("👍 拿到了用户输入的账号跟密码: ", userInputName, "|" ,userInputPwd)
 
 	// 先从数据库内找到用户
 	user := models.FindUserByName(userInputName) 

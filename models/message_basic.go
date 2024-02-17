@@ -92,7 +92,7 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 
 	//【☝️第七步】调用消息的接收方法（发送方也会接收到自己发送的消息）
 	go receiveProc_websocketMsg_Personal(node) // 接收消息的协程
-	sendMsg_Podcast(userId, []byte("🚀 欢迎加入聊天室")) // 连接后, 默认发送一条消息
+	sendMsg_Podcast(userId, []byte("🚀 欢迎加入聊天室")) // 连接后, 默认给前端发送一条消息
 
 }
 
