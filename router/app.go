@@ -18,6 +18,7 @@ func Router() *gin.Engine { // 返回值 *gin.Engin e是一个指向 Gin 框架�
 
 	// 🌟 静态资源（前端）
 	router.Static("/asset", "asset/") // 各种静态文件
+	router.StaticFile("/favicon.ico", "asset/images/favicon.ico")
 	router.LoadHTMLGlob("views/**/*") // 加载 HTML 视图文件 
 
 

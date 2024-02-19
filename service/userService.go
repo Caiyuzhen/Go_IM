@@ -1,15 +1,17 @@
 package service
 
 import (
+	_"encoding/json"
 	"fmt"
 	"ginchat/models" // 引入 model 内的方法
-	"ginchat/utils" // 引入 utils 内的方法
+	"ginchat/utils"  // 引入 utils 内的方法
 	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
+
 	// "golang.org/x/net/websocket"
 	"github.com/gorilla/websocket"
 
@@ -178,7 +180,6 @@ func UpdateUser(c *gin.Context) { // 处理路由的数据 => 获取用户列表
 }
 
 
-
 // Login
 // @Summary 登录
 // @Tags 用户模块
@@ -188,7 +189,7 @@ func UpdateUser(c *gin.Context) { // 处理路由的数据 => 获取用户列表
 // @Router /user/login [post]
 func FindUserByNameAndPassword(c *gin.Context) { // 处理用户登录的路由服务
 	data := models.UserBasic{}
-
+	
 	// PATH 数据
 	// userInputName := c.Query("name") // 拿到用户输入的用户名 （取出路由 PATH 形式的数据）
 	// userInputPwd := c.Query("password")  // 拿到用户输入的密码 （取出路由 PATH 形式的数据）
@@ -198,7 +199,9 @@ func FindUserByNameAndPassword(c *gin.Context) { // 处理用户登录的路由�
 	userInputPwd := c.Request.FormValue("password") // 拿到用户输入的密码 (取出表单形式的数据)
 
 
+    // 打印用户名和密码
 	fmt.Println("👍 拿到了用户输入的账号跟密码: ", userInputName, "|" ,userInputPwd)
+
 
 	// 先从数据库内找到用户
 	user := models.FindUserByName(userInputName) 
