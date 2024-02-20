@@ -1,10 +1,11 @@
 package service
 
 import (
-	_"encoding/json"
+	_ "encoding/json"
 	"fmt"
 	"ginchat/models" // 引入 model 内的方法
 	"ginchat/utils"  // 引入 utils 内的方法
+	"html/template"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -18,6 +19,21 @@ import (
 	// "github.com/thedevsaddam/govalidator"
 	"github.com/asaskevich/govalidator"
 )
+
+// 登录后的路由跳转
+func ToRegister(c *gin.Context) {
+	fmt.Println("👍 跳转到注册页面")
+	// 👇 使用 Gin 提供的的方法来渲染 html
+	// c.HTML(http.StatusOK, "user/register.html", nil) // 接收状态码、模板文件名、传给模板的数据
+	ind, err := template.ParseFiles("views/user/register.html") // 解析模板文件
+	if err != nil {
+		fmt.Println("❌ 解析模板文件失败: ", err)
+	}
+	ind.Execute(c.Writer, nil) // 渲染模板文件
+}
+
+
+
 
 // GetAllUserList
 // @Summary 获取所有用户列表
@@ -45,16 +61,35 @@ func UserListService(c *gin.Context) { // 处理路由的数据 => 获取用户�
 // @Router /user/createUser [get]
 func CreateUser(c *gin.Context) { // 处理路由的数据 => 🌟 注册用户
 	user := models.UserBasic{} // 实例化一个 UserBasic 类型的 user 对象
-	user.Name = c.Query("name") // 【因为 user 在上面 user := models.UserBasic{} 实例化了, 因此直接 user.Name 】 => 获取路由中的 name 参数 => Query 是 gin 框架的方法
-	password := c.Query("password") // 获取路由中的 password 参数 => Query 是 gin 框架的方法
-	rePassword := c.Query("rePassword") // 获取路由中的 rePassword 参数 => Query 是 gin 框架的方法
+
+	// 👇 前端 url path 提交, 这里 Query 数据
+	// user.Name = c.Query("name") // 【因为 user 在上面 user := models.UserBasic{} 实例化了, 因此直接 user.Name 】 => 获取路由中的 name 参数 => Query 是 gin 框架的方法
+	// password := c.Query("password") // 获取路由中的 password 参数 => Query 是 gin 框架的方法
+	// rePassword := c.Query("rePassword") // 获取路由中的 rePassword 参数 => Query 是 gin 框架的方法
+
+	// 👇 前端通过 Form 表单提交, 这里通过表单获取
+	user.Name = c.Request.FormValue("name")
+	password := c.Request.FormValue("password")
+	rePassword := c.Request.FormValue("rePassword")
 
 	salt := fmt.Sprintf("%06d", rand.Int31()) // 🔥🔥 表示生成一个 6 位的随机数, 因为 Sprintf 返回的是一个格式化的字符串, 而 rand.Int31() 返回的是一个 int32 类型的随机数, 因此需要使用 %06d 来格式化
 
-	data := models.FindUserByName(user.Name) // 调用 model 内的方法来查找同名用户, 如果 FindUserByName 返回为空则表示还没有注册这个用户
+	
 
-	// 判断是否已经有同名的注册用户
-	if data.Name != "" { // model 内的 FindUserByName 会返回 userr
+	// 判断输入的用户名或密码是否为空 (⚠️ 注意这里是 user.Name 跟 password, 跟下面不一样！)
+	if user.Name == "" && password == "" && rePassword == "" {
+		c.JSON(-1, gin.H {
+			"code": -1, // 更好的返回值格式, 0 表示成功, -1 表示失败
+			"message": "❌ 用户名或密码不能为空",
+			"data": "",
+		})
+		return
+	}
+	
+
+	// 判断是否已经有同名的注册用户 (⚠️ 注意这里是 data.Name, 是去查询数据库看是否重名!!)
+	data := models.FindUserByName(user.Name) // 调用 model 内的方法来查找同名用户, 如果 FindUserByName 返回为空则表示还没有注册这个用户
+	if data.Name != "" { // model 内的 FindUserByName 会返回 userr, 如果 model 内的 name 不为空, 则表示已经有同名的注册用户
 		c.JSON(-1, gin.H {
 			"code": -1, // 更好的返回值格式, 0 表示成功, -1 表示失败
 			"message": "❌ 用户名已存在",
@@ -64,6 +99,7 @@ func CreateUser(c *gin.Context) { // 处理路由的数据 => 🌟 注册用户
 	}
 	
 
+	// 判断两次密码是否相同
 	if password != rePassword {
 		c.JSON(-1, gin.H {
 			"code": -1, // 更好的返回值格式, 0 表示成功, -1 表示失败

@@ -15,7 +15,8 @@ func GetIndex(c *gin.Context) { // 处理路由的数据服务 => 初始化, 并
 
 	
 	// 👇 使用 Gin 提供的的方法来渲染 html
-	c.HTML(http.StatusOK, "index.html", nil)
+	c.HTML(http.StatusOK, "index.html", nil) // 接收状态码、模板文件名、传给模板的数据
+
 	
 
 	// 👇 使用模板方法渲染 html
