@@ -22,11 +22,12 @@ func Router() *gin.Engine { // 返回值 *gin.Engin e是一个指向 Gin 框架�
 	router.LoadHTMLGlob("views/**/*") // 🔥 加载所有 HTML 视图文件 
 
 
-	// 🌟【路由 API】
+	// 🌟首页
 	// router.GET("/index", service.GetIndex) // 🌟【http://localhost:8081/index】 首页
 	router.GET("/", service.GetIndex) // 🌟【http://localhost:8081/】 首页
 	router.GET("/index", service.GetIndex) // 🌟【http://localhost:8081/index】 首页
-	router.GET("/register", service.ToRegister) // 【http://localhost:8081/register, 跳转页面
+	router.GET("/register", service.ToRegister) // 【http://localhost:8081/register  跳转到注册页
+	router.GET("/toChat", service.ToChat) // 【http://localhost:8081/register  跳转到聊天页
 
 	// 用户模块
 	router.POST("/user/getUserList", service.UserListService) // 🌟 获取用户列表 【http://localhost:8081/user/getUserList】 router 内数据的处理方式放在 Server 层  =>  比如 GetUserList 方法

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"ginchat/models" // 引入 model 内的方法
 	"ginchat/utils"  // 引入 utils 内的方法
-	"html/template"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -20,17 +19,6 @@ import (
 	"github.com/asaskevich/govalidator"
 )
 
-// 登录后的路由跳转
-func ToRegister(c *gin.Context) {
-	fmt.Println("👍 跳转到注册页面")
-	// 👇 使用 Gin 提供的的方法来渲染 html
-	// c.HTML(http.StatusOK, "user/register.html", nil) // 接收状态码、模板文件名、传给模板的数据
-	ind, err := template.ParseFiles("views/user/register.html") // 解析模板文件
-	if err != nil {
-		fmt.Println("❌ 解析模板文件失败: ", err)
-	}
-	ind.Execute(c.Writer, nil) // 渲染模板文件
-}
 
 
 

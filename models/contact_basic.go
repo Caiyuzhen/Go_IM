@@ -14,4 +14,8 @@ type ContactBasic struct {
 func (table *ContactBasic) TableName() string { // TableName 为数据表, 用于指定表名
 	return "contact_basic" // 在 db 中的表名
 }
+
+
+
+
 	

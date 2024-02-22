@@ -4,6 +4,7 @@
 <head>
     <!--js include-->
 	<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script> -->
+	<!-- 👇 抽离出了模板 -->
     {{template "/chat/head.shtml"}}
 </head>
 <body>
@@ -53,9 +54,9 @@
                 util.post("user/login",this.user).then(res=>{
                     console.log(res)
                     if(res.code!=0){
-                        mui.toast(res.message)
+                        mui.toast(res.message) // 🔥 从登录成功的接口中拿到返回值
                     }else{         
-                        var url = "/toChat?userId="+res.data.ID+"&token="+res.data.Identity
+                        var url = "/toChat?userId="+res.data.ID+"&token="+res.data.Identity // 🔥 把登录成功的返回值给到跳转 chat 的接口
                         userInfo(res.data)
                         userId(res.data.ID)
                         mui.toast("登录成功,即将跳转")

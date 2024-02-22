@@ -1,6 +1,7 @@
 {{define "/chat/foot.shtml"}}
 <script>
 
+	// 上传文件
     function upload(dom) {
         uploadfile("attach/upload", dom, function (res) {
             if (res.Code == 0) {
@@ -263,7 +264,7 @@
                     }
                 },
                 showweixin: function () {
-                    mui.alert("请加微信号msb-shenzhuan索取")
+                    mui.alert("请加微信号 zeno 索取")
                 },
                 showmsg: function (user, msg, isReverse, isFirst) {
                     //console.log(">>>>>>>>>>>", user)
@@ -454,10 +455,9 @@
                         })
 
                     }.bind(this))
-
                 },
-                initwebsocket: function () {
-                    var url = "ws://" + location.host + "/chat?userId=" + userId() + "&token=" + util.parseQuery("token");
+                initwebsocket: function () { // 👇 调用发送消息的接口
+                    var url = "ws://" + location.host + "/user/sendUserMsg?userId=" + userId() + "&token=" + util.parseQuery("token");
                     this.webSocket = new WebSocket(url);
                     //消息处理
                     this.webSocket.onmessage = function (evt) {
@@ -636,7 +636,7 @@
                         this.isDisable = true;
                     }, 100)
                 },
-                heartbeat() {
+                heartbeat() { // 长连接, 轮循发送心跳
                     if (this.webSocket.readyState == 1) {  //失去连接 3
                         var msg = this.createmsgcontext();
                         msg.Media = -1;
