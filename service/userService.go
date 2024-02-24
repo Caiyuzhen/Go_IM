@@ -243,6 +243,7 @@ func FindUserByNameAndPassword(c *gin.Context) { // 处理用户登录的路由�
 	// fmt.Println("😄 找到了用户的盐值: ", user.Salt)
 	// fmt.Println("😄 找到了用户的加密密码: ", dataBaseUserPassword) // user.Password 是加密后的密码
 
+
 	// 👆上面通过 name 拿到用户后, 拿到用户的【盐值】跟【用户所输入的密码】并进行 md5 的解密
 	flag := utils.ValidPassword(userInputPwd, user.Salt, dataBaseUserPassword)// user.Password 是加密后的密码, 因为在数据库内的密码是加密过的, 因此这里需要解密后才能查询
 	if !flag { // 如果密码不正确, !flag 表示 flag 为 false
@@ -254,15 +255,16 @@ func FindUserByNameAndPassword(c *gin.Context) { // 处理用户登录的路由�
 		return
 	}
 
+
 	// 解密密码 -> 因为数据库内储存的是 🔐 加密后的密码, 所以要重新加密再去数据库进行比对
 	pwd := utils.MakePassword(userInputPwd, user.Salt)
 	data = models.FindUserByNameAndPasswordInModel(userInputName, pwd) // 🔥 需要传入解密后的密码！！
-
-	c.JSON(200, gin.H { // 密码正确的返回值
+	c.JSON(200, gin.H { // 密码正确的话, 返回登录的用户信息
 		"code": 0, // 更好的返回值格式, 0 表示成功, -1 表示失败
 		"message": "✅ 登录成功",
 		"data": data,
 	})
+	fmt.Println("✅ 登录成功: ", data)
 }
 
 
@@ -323,4 +325,32 @@ func MsgHandler(ws *websocket.Conn, ctx *gin.Context) {
 // 发送单聊的方法
 func SendUserMsg(c *gin.Context) {
 	models.Chat(c.Writer, c.Request)
+}
+
+
+
+
+
+// ——————————————————————————————————————————————————————————————————————————————————————————————
+
+
+
+
+
+// 搜索好友的方法
+func SearchFriends(c * gin.Context) {
+	userId := c.PostForm("userId") // 拿到表单中的 userId 参数 (string)
+	userIdInt, _ := strconv.Atoi(userId) // 字符串转为 int 类型
+	userUInt := uint(userIdInt) // int 转为 uint 类型
+	users := models.SearchFriend(userUInt)
+
+	// 返回结果(测试用)
+	// c.JSON(200, gin.H {
+	// 	"code": 0, // 更好的返回值格式, 0 表示成功, -1 表示失败
+	// 	"message": "✅ 查找好友成功",
+	// 	"data": users, // 返回查找到的好友数据(包含多个)
+	// })
+
+	// 分页返回结果
+	utils.RespOkList(c.Writer, users, len(users))
 }

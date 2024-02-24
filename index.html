@@ -56,10 +56,11 @@
                     if(res.code!=0){
                         mui.toast(res.message) // 🔥 从登录成功的接口中拿到返回值
                     }else{         
-                        var url = "/toChat?userId="+res.data.ID+"&token="+res.data.Identity // 🔥 把登录成功的返回值给到跳转 chat 的接口
+						// 🔥 把登录成功的返回值给到跳转 toChat 的接口, 让系统能够自动跳转到好友页面
+                        var url = "/toChat?userId="+res.data.ID+"&token="+res.data.Identity
                         userInfo(res.data)
                         userId(res.data.ID)
-                        mui.toast("登录成功,即将跳转")
+                        mui.toast("✅ 登录成功, 即将跳转到好友页面...")
                         location.href = url
                     }
                 })

@@ -112,7 +112,7 @@ func UpdateUser(user UserBasic) *gorm.DB { // 返回 DB 内的用户数据
 // 🌟 普通方法 => 用于登录
 func FindUserByNameAndPasswordInModel(name string, password string) UserBasic {
 	user := UserBasic{}
-	utils.DB.Where("name = ? and password", name, password).First(&user) // 从 DB 内找到用户名跟密码都相同的数据, 并返回, 如果返回为空则表示 ❌ 错误
+	utils.DB.Where("name = ? AND password = ?", name, password).First(&user) // 从 DB 内找到用户名跟密码都相同的数据, 并返回, 如果返回为空则表示 ❌ 错误
 
 	// 生成 JWT （JSON Web Tokens）鉴权 token
 	str := fmt.Sprintf("%d", time.Now().Unix())// 拿到系统时间戳
