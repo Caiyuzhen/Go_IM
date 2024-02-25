@@ -80,3 +80,10 @@ func ToChat(c *gin.Context) {
 }
 
 
+
+// 调用 model 层内的 Chat 方法, 用来发送消息
+func UseChat(c *gin.Context) {
+	models.Chat(c.Writer, c.Request)
+}
+
+

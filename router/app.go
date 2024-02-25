@@ -27,9 +27,13 @@ func Router() *gin.Engine { // 返回值 *gin.Engin e是一个指向 Gin 框架�
 	router.GET("/", service.GetIndex) // 🌟【http://localhost:8081/】 首页
 	router.GET("/index", service.GetIndex) // 🌟【http://localhost:8081/index】 首页
 	router.GET("/register", service.ToRegister) // 【http://localhost:8081/register  跳转到注册页
-	router.GET("/toChat", service.ToChat) // 【http://localhost:8081/register  跳转到聊天页
 
-	// 用户模块
+
+	// 💬 消息
+	router.GET("/toChat", service.ToChat) // 【http://localhost:8081/register  跳转到聊天页
+	router.GET("/useChat", service.UseChat) // 【http://localhost:8081/useChat  发送聊天消息
+
+	// 😄 用户模块
 	router.POST("/user/getUserList", service.UserListService) // 🌟 获取用户列表 【http://localhost:8081/user/getUserList】 router 内数据的处理方式放在 Server 层  =>  比如 GetUserList 方法
 	router.POST("/user/createUser", service.CreateUser) // 新增用户(注册）的接口 => http://localhost:8081/user/createUser?name=Annie&password=123456&rePassword=123456'
 	router.POST("/user/deleteUser", service.DeleteUser) // 删除用户的接口 => http://localhost:8081/user/deleteUser?id=1
@@ -37,7 +41,7 @@ func Router() *gin.Engine { // 返回值 *gin.Engin e是一个指向 Gin 框架�
 	router.POST("/user/login", service.FindUserByNameAndPassword) // 用户登录的接口 => http://localhost:8081/user/login?name=海绵宝宝&password=123456
 
 
-	// 好友模块
+	// 👥 好友模块
 	router.POST("/searchFriends", service.SearchFriends) // 查找好友的接口 => http://localhost:8081/SearchFriend => 参数为 userId=3
 
 

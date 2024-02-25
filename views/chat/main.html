@@ -63,9 +63,11 @@
         <div class="item-3" @tap="() => {panelstat==='doutu'? panelstat='kbord' : panelstat='doutu'}">
             <i class="iconfont icon-7biaoqing-1"></i>
         </div>
+		<!-- 👇 没有消息时候, 发送图标变为 more -->
         <div class="item-4" v-if="!txtmsg" @tap="() => {panelstat==='more'? panelstat='kbord' : panelstat='more'}">
             <i class="iconfont icon-jiahao"></i>
         </div>
+		<!-- 👇 调用 sendtxtmsg 函数, 传入 txtmsg 参数 -->
         <div class="item-4" v-if="!!txtmsg" @tap="sendtxtmsg(txtmsg)">
             <i class="iconfont icon-fasong"></i>
         </div>

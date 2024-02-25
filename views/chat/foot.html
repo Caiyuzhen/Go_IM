@@ -143,9 +143,10 @@
                 this.loadfriends();
                 this.loadcommunitys();
                 this.loaddoutures();
-                setInterval(this.heartbeat, 10 * 1000);
+                setInterval(this.heartbeat, 20 * 1000); // 每隔 20s 发送一次心跳
                 var user = userInfo()
-                //初始化websocket
+
+                // 🌟 初始化websocket
                 this.initwebsocket()
                 this.initUser();
 
@@ -313,14 +314,16 @@
                 sendtxtmsg: function (txt) {
                     if (this.isDisable) {
                         this.setTimeFlag()
+						// 👇 传入消息 id, 用户 id 等信息
                         //{id:1,userid:2,dstid:3,cmd:10,media:1,content:"hello"}
                         var msg = this.createmsgcontext();
                         msg.Media = 1;
-                        msg.Content = txt;
+                        msg.Content = txt; // 传入具体的消息
                         if (msg.Type == 1) {
-                            this.showmsg(userInfo(), msg);
+                            this.showmsg(userInfo(), msg); // 👈 显示自己的消息
                         }
 
+						// 👇 通过 webSocket 发送消息
                         this.webSocket.send(JSON.stringify(msg))
                     }
                 },
@@ -376,10 +379,10 @@
                         this.setTimeFlag()
                         //console.log(user)
                         this.win = "single";
-                        this.title = "和" + user.Name + "聊天中";
+                        this.title = "💬" + "和" + user.Name + "聊天中";
                         this.otherAvatar = user.Avatar;
                         this.msgcontext.TargetId = parseInt(user.ID);
-                        this.msgcontext.Type = 1;
+                        this.msgcontext.Type = 1; // 👈 消息类型, 私聊是 1, 后端的定义
                         mui('.mui-scroll-wrapper').scroll({
                             scrollY: true, //是否竖向滚动
                             scrollX: false, //是否横向滚动
@@ -435,6 +438,8 @@
                         cb(userinfo)
                     }
                 },
+
+				// 👇👇 接收他人发来消息的方法
                 onmessage: function (data) {
                     this.loaduserinfo(data.userId, function (user) {
 
@@ -456,8 +461,10 @@
 
                     }.bind(this))
                 },
+				// 👇 初始化 webSocket
                 initwebsocket: function () { // 👇 调用发送消息的接口
-                    var url = "ws://" + location.host + "/user/sendUserMsg?userId=" + userId() + "&token=" + util.parseQuery("token");
+					// 👇👇 发送消息给其他人的接口
+					var url = "ws://" + location.host + "/useChat?userId=" + userId() + "&token=" + util.parseQuery("token");
                     this.webSocket = new WebSocket(url);
                     //消息处理
                     this.webSocket.onmessage = function (evt) {
