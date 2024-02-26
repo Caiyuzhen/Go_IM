@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
+	"fmt"
 )
 
 // 🔥 分页的工具类（好友列表分页）
@@ -18,6 +19,7 @@ type H struct {
 
 // Resp 通用响应函数 (只返回字符串)
 func Resp(w http.ResponseWriter, code int, data interface{}, msg string) {
+	fmt.Println("🚀🚀🚀 响应的数据", data)
 	// 设置响应的Content-Type为application/json
 	w.Header().Set("Content-Type", "application/json")
 
@@ -31,12 +33,15 @@ func Resp(w http.ResponseWriter, code int, data interface{}, msg string) {
 		Msg: msg, // 消息
 	}
 
-	// 把结构体实例转为 json
+	// 把结构体实例转为 json  二进制 （序列化）
 	res, err := json.Marshal(h)
 	if err != nil {
 		RespFail(w, "❌ json 转化出错")
 		return
 	}
+
+	fmt.Println("🚀🚀🚀 序列化为 json 后: ",  string(res))
+	fmt.Println("____________________________")
 
 	// 返回转化后的 json
 	w.Write(res)
@@ -73,7 +78,7 @@ func RespList(w http.ResponseWriter, code int, data interface {}, total interfac
 
 
 
-// RespFail 表示请求处理失败的响应 (不带数据返回)
+// RespFail 表示请求处理失败的响应 
 func RespFail(w http.ResponseWriter, msg string) {
 	Resp(w, -1, nil, msg) // -1 表示失败
 }
@@ -81,9 +86,9 @@ func RespFail(w http.ResponseWriter, msg string) {
 
 
 
-// RespOk 表示请求处理成功的响应 (不带数据返回)
-func RespOk(w http.ResponseWriter, data interface {}, msg string) {
-	Resp(w, 0, nil, msg) // -1 表示失败
+// RespOK 表示请求处理成功的响应
+func RespOK(w http.ResponseWriter, data interface {}, msg string) {
+	Resp(w, 0, data, msg) // -1 表示失败
 }
 
 

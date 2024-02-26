@@ -11,27 +11,28 @@ import (
 func Router() *gin.Engine { // 返回值 *gin.Engin e是一个指向 Gin 框架的核心引擎的指针, 在Gin框架中, gin.Engine 是处理所有请求的主要结构体
 	router := gin.Default() // 🚀 router 是 gin.Engine 的实例
 
-	// 🌟 使用 【ginSwagger】 中间件来生成 API 文档 => API文档化：Swagger可以自动从你的代码生成API文档，并生成可视化界面来调用API，还可以为每个API设置测试用例，方便测试
+	// 📃 使用 【ginSwagger】 中间件来生成 API 文档 => API文档化：Swagger可以自动从你的代码生成API文档，并生成可视化界面来调用API，还可以为每个API设置测试用例，方便测试
 	docs.SwaggerInfo.BasePath = "" // 🔥 访问 swagger 生成的 API 文档 => http://localhost:8081/swagger/index.html
 	router.GET("/swagger/*any", ginSwagger.WrapHandler((swaggerfiles.Handler))) // 表示任何路由都可以访问 swagger
 
 
-	// 🌟 静态资源（前端）
+	// ⌚️ 静态资源（前端）
 	router.Static("/asset", "asset/") // 各种静态文件
 	router.StaticFile("/favicon.ico", "asset/images/favicon.ico")
 	router.LoadHTMLGlob("views/**/*") // 🔥 加载所有 HTML 视图文件 
 
 
-	// 🌟首页
+	// 🏡 首页
 	// router.GET("/index", service.GetIndex) // 🌟【http://localhost:8081/index】 首页
 	router.GET("/", service.GetIndex) // 🌟【http://localhost:8081/】 首页
 	router.GET("/index", service.GetIndex) // 🌟【http://localhost:8081/index】 首页
 	router.GET("/register", service.ToRegister) // 【http://localhost:8081/register  跳转到注册页
 
-
-	// 💬 消息
+ 
+	// 💬 收发消息
 	router.GET("/toChat", service.ToChat) // 【http://localhost:8081/register  跳转到聊天页
 	router.GET("/useChat", service.UseChat) // 【http://localhost:8081/useChat  发送聊天消息
+	router.POST("/attach/upload", service.Upload) // 上传图片的接口 => 【http://localhost:8081/attach/upload】
 
 	// 😄 用户模块
 	router.POST("/user/getUserList", service.UserListService) // 🌟 获取用户列表 【http://localhost:8081/user/getUserList】 router 内数据的处理方式放在 Server 层  =>  比如 GetUserList 方法

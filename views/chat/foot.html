@@ -1,7 +1,7 @@
 {{define "/chat/foot.shtml"}}
 <script>
 
-	// 上传文件
+	// 上传文件 (图片)
     function upload(dom) {
         uploadfile("attach/upload", dom, function (res) {
             if (res.Code == 0) {
@@ -249,6 +249,7 @@
                     var that = this;
                     for (var id in res) {
                         this.$http.get(res[id]).then(response => {
+							// 🔥 pkginfo 就是表情包
                             pkginfo = response.data
                             var baseurl = config.baseurl + "/" + pkginfo.id + "/"
                             // console.log("post res[i]",id,res[id],pkginfo)
@@ -332,6 +333,7 @@
                         this.setTimeFlag()
                         //{id:1,userid:2,dstid:3,cmd:10,media:4,url:"http://www.baidu.com/a/log,jpg"}
                         var msg = this.createmsgcontext();
+						console.log("🌟 拿到了图片消息", msg);
                         msg.Media = 4;
                         msg.url = picurl;
                         if (msg.Type == 1) {
