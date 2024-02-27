@@ -43,35 +43,62 @@ func SearchFriend(userId uint) []UserBasic { // 传入 userID, 返回好友的�
 	return users // 返回好友的信息
 }
 
-// 添加好友 (是双向的, A 加了 B, A 同时也被 B 加了)
-func AddFriend(userId uint, targetId uint) int {
-	user := UserBasic{}
+
+
+// 😄 添加好友 -  通过 ID 添加好友 (好友是双向的, A 加了 B, A 同时也被 B 加了)
+func AddFriend(userId uint, targetId uint) (int, string) { // 返回数字 + 字符串  =>  比如 0 + "添加成功", -1 + "添加失败"
+	user := UserBasic{} // 创建一个 user 的实例
+
 	if targetId != 0 { // 如果没传入目标用户的 id
 		fmt.Println("👍 拿到了前端传来的 userID: ", userId, "跟 targetID: ", targetId)
 		user = FindUserByID(targetId) // 传入要找的 id, 找到某个用户
 
-		if user.Identity != "" { // 如果要添加的好友不为空
+		if user.Salt != "" { // 如果要添加的好友不为空 (判断 Identity 或 Salt 不为空都行)
 
-			// GORM 的【事务】可以保证数据的一致性 （比如一张表要同时写入两次), 【事务】默认是开启的
+			// 判断不能自己加自己为好友
+			if userId == user.ID {
+				return -1, "❌ 不能添加自己为好友"
+			}
+
+			// 不能添加已经加过的好友
+			contact := ContactBasic{} // 创建一个 ContactBasic 的实例
+			utils.DB.Where("owner_id = ? and target_id = ? and type = 1", userId, targetId).First(&contact) // 通过数据库去查找这个人的好友, 过滤 contact
+			if contact.ID != 0 { // 如果 contact.ID 不为空, 就说明已经添加过好友了 (因为在联系人表中有这个人)
+				return -1, "❌ 不能重复添加好友"
+			}
+
+			// 【事物】GORM 的【事务】可以保证数据的一致性 （比如一张表要同时写入两次), 【事务】默认是开启的
 			tx := utils.DB.Begin() // 💼 开启事务 *************
 
-			contact := ContactBasic{}
-			contact.OwnerId = userId
-			contact.TargetId = targetId
-			contact.Type = 1          // ContactBasic 结构体的定义, 加好友, 类型为 1
-			utils.DB.Create(&contact) //【⚡️ 传入实例】, 新建一条数据表的数据
+			defer func() { // 处理事务中如果出错了, 就会自动回滚
+				if r := recover(); r != nil {
+					tx.Rollback() // 💼 回滚事务 *************
+				}
+			}()
 
 			contact2 := ContactBasic{}
-			contact2.OwnerId = targetId
-			contact2.TargetId = userId
-			contact2.Type = 1
-			utils.DB.Create(&contact2) //【⚡️ 传入实例】, 新建一条数据表的数据
+			contact2.OwnerId = userId
+			contact2.TargetId = targetId
+			contact2.Type = 1          // ContactBasic 结构体的定义, 加好友, 类型为 1
+			if err := utils.DB.Create(&contact2).Error; err != nil {  //【⚡️ 传入实例】, 新建一条数据表的数据
+				tx.Rollback() // 💼 回滚事务 *************
+				return -1, "❌ 好友添加失败"
+			}
+
+			contact3 := ContactBasic{}
+			contact3.OwnerId = targetId
+			contact3.TargetId = userId
+			contact3.Type = 1
+			if err := utils.DB.Create(&contact3).Error; err != nil {  //【⚡️ 传入实例】, 新建一条数据表的数据
+				tx.Rollback() // 💼 回滚事务 *************
+				return -1, "❌ 好友添加失败"
+			}
 
 			tx.Commit() // 💼 提交事务 *************
-			return 0
+			return 0, "✅ 好友添加成功"
 		}
-		return -1 // 否则为空, 就说明找不到这个用户
+		return -1, "❌ 没有找到此用户" // 否则为空, 就说明找不到这个用户
 	}
 
-	return -1 // 如果没有传入 targetId, 就返回 -1
+	return -1, "❌ 好友 ID 不能为空" // 如果没有传入 targetId, 就返回 -1
 }
