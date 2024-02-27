@@ -119,7 +119,7 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 func sendProc_websocketMsg_Personal(node *Node) {
 	for {
 		select {
-		case data := <-node.DataQueue: // 从管道中获取数据 🔥
+		case data := <- node.DataQueue: // 从管道中获取数据 🔥
 			err := node.Conn.WriteMessage(websocket.TextMessage, data) // 发送消息
 			if err != nil {
 				fmt.Println("❌ 发送消息失败 (sendProc_websocketMsg_Personal)", err)
@@ -168,7 +168,7 @@ func init() {
 
 
 // 【📢 广播消息到局域网内的方法】用于处理 UDP 广播消息的发送, 从 udpSendChan 通道中读取消息, 并通过 UDP 协议将这些消息广播到局域网内
-func udpSendProc_Podcast() {
+func udpSendProc_Podcast() { // 👈 也可以用来广播群消息
 	con, err := net.DialUDP("udp", nil, &net.UDPAddr{ // DialUDP 为 net 包中的方法, 用于发送 udp 数据
 		IP:   net.IPv4(192, 168, 0, 255), // 广播到局域网内, 传入以太网 ip (路由的网关地址)
 		Port: 3000,
@@ -197,7 +197,7 @@ func udpSendProc_Podcast() {
 
 
 // 【📢 接收广播消息】, 责监听 UDP 广播消息, 当局域网内有消息广播时, 这个协程会接收到这些消息并进行获取
-func udpReceiveProc_Podcast() {
+func udpReceiveProc_Podcast() { // 👈 也可以用来广播群消息
 	con, err := net.ListenUDP("udp", &net.UDPAddr{ // ListenUDP 为 net 包中的方法, 用于接收 udp 数据
 		IP:   net.IPv4zero, // IPv4ero  (0,0,0,0)  => 表示所有 ip 端口都可以接受
 		Port: 3000,

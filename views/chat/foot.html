@@ -188,18 +188,24 @@
                     }
 
                     this.duration = new Date().getTime();
+
+					// 👇 拿到摄像头或音频的数据
                     //video 摄像头   ，audio 音频
                     navigator.mediaDevices.getUserMedia({ audio: true, video: false })
                         .then(function (stream) {
                             this.showprocess = true
-                            this.recorder = new MediaRecorder(stream);
+                            this.recorder = new MediaRecorder(stream); // 👈 创建一个 recorder 对象
                             audioTarget.srcObject = stream;
-                            //是否可用
+
+                            // 是否可用 (移动端才可以发送)
                             this.recorder.ondataavailable = (event) => {
                                 console.log("ondataavailable");
+
+								// 👇 调用上传图片的接口（音视频都可以用同一个接口 attach/upload)
                                 uploadblob("attach/upload", event.data, ".mp3", res => {
-                                    var duration = Math.ceil((new Date().getTime() - this.duration) / 1000);
-                                    this.sendaudiomsg(res.Data, duration);
+                                    var duration = Math.ceil((new Date().getTime() - this.duration) / 1000); // 👈 语音时长 = 按下的时间 - 发送的时长
+                                    this.sendaudiomsg(res.Data, duration); // 👈 拿到后端存好后返回的音频数据
+									console.log("🔥 后端存好后返回的音频数据: ", res.Data, "——————————————————————");
                                 })
                                 stream.getTracks().forEach(function (track) {
                                     track.stop();
@@ -311,7 +317,7 @@
                 startrecord: function () {
 
                 },
-                //跟谁单聊
+                //👇 前端发送单聊消息 ——————————————————————————————
                 sendtxtmsg: function (txt) {
                     if (this.isDisable) {
                         this.setTimeFlag()
@@ -328,6 +334,7 @@
                         this.webSocket.send(JSON.stringify(msg))
                     }
                 },
+				//👇 前端发送图片消息 ——————————————————————————————
                 sendpicmsg: function (picurl) {
                     if (this.isDisable) {
                         this.setTimeFlag()
@@ -342,18 +349,20 @@
                         this.webSocket.send(JSON.stringify(msg))
                     }
                 },
+				//👇 前端发送音频消息 ——————————————————————————————
                 sendaudiomsg: function (url, num) {
                     if (this.isDisable) {
                         this.setTimeFlag()
+						// 👇 消息的结构
                         //{id:1,userid:2,dstid:3,cmd:10,media:3,url:"http://www.a,com/dsturl.mp3",anount:40}
-                        var msg = this.createmsgcontext();
+                        var msg = this.createmsgcontext(); // 👈 实例化消息结构
                         msg.Media = 3;
                         msg.url = url;
                         msg.amount = num;
                         if (msg.Type == 1) {
                             this.showmsg(userInfo(), msg);
                         }
-                        //console.log("sendaudiomsg",this.msglist);
+						// console.log("🔥 后端存好后返回的音频数据: ", res.Data, "——————————————————————");
                         this.webSocket.send(JSON.stringify(msg))
                     }
                 },
@@ -514,7 +523,7 @@
                 addfriend: function () {
                     //console.log("addfriend....")
                     var that = this;
-                    mui.prompt('', '请输入好友名称', '加好友', ['取消', '确认'], function (e) {
+                    mui.prompt('', '请输入好友名称(好友 id)', '加好友', ['取消', '确认'], function (e) {
                         if (e.index == 1) {
                             //判断数字
                             //if (isNaN(e.value) || e.value <= 0) {
@@ -530,13 +539,15 @@
                     document.querySelector('.mui-popup-input input').type = 'text';
 
                 },
+				// 👇 添加好友的方法
                 _addfriend: function (dstobj) {
                     //防止一次点击 穿透访问多次
                     if (this.isDisable) {
                         this.setTimeFlag()
                         //console.log("_addfriend....")
                         var that = this
-                        post("contact/addfriend", { targetName: dstobj, userId: userId() }, function (res) {
+                        post("contact/addFriends", { targetId: dstobj, userId: userId() }, function (res) { // 👈 记得前后端参数需要一致 !!
+							console.log("👋 传给后端的 targetId", dstobj, "userId", userId);
                             if (res.Code == 0) {
                                 mui.toast("添加成功");
                                 that.loadfriends();

@@ -11,12 +11,20 @@
 - 123456
 
 
+## 配置 Redis | mySQL 数据库的位置
+- config
+
+
 ## 整体安装缺失依赖
 - go mod download
 
 
 ## 汇总所有 go 的依赖
 - go mod tidy
+
+
+## 保存前端传来资源的位置
+- asset/upload
 
 
 ## 安装库

@@ -29,7 +29,7 @@ func Resp(w http.ResponseWriter, code int, data interface{}, msg string) {
 	// 实例化结构体
 	h := H {
 		Code: code,
-		Rows: data, // 行数
+		Data: data, // 🔥🔥 返回前段传来的数据（比如上传图片！）
 		Msg: msg, // 消息
 	}
 
