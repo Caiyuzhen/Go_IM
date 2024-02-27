@@ -34,6 +34,7 @@
         return parseInt(util.parseQuery("userId")) // 获得后端来的 userId
     }
     var app = new Vue(
+		// 👇 数据
         {
             el: "#pageapp",
             data: {
@@ -137,6 +138,13 @@
                 iscomplete: false,
                 duration: 0,
                 showprocess: false,
+				community: { // 👈 群的数据结构
+					ownerId: "",
+					name: "",
+					desc: "",
+					cate: "",
+					icon: ""
+				}
 
             },
             created: function () {
@@ -154,6 +162,8 @@
             mounted: function () {
 
             },
+
+			// 👇 方法
             methods: {
                 initUser() {
                     let userInfo = JSON.parse(sessionStorage.getItem('userinfo') || '{}');
@@ -557,35 +567,39 @@
                         })
                     }
                 },
-                //个人资料修改显示
+
+                // 个人资料修改显示
                 setUserInfo: function () {
                     this.win = "userinfo"
                     //  console.log("createCom")
                 },
-                //新建群显示
+
+                // 新建群显示
                 createCom: function () {
                     this.win = "community"
                     //  console.log("createCom")
                 },
 
-                //新建群提交
+                // 👇 新建群
                 createcommunity() {
                     //console.log("createcommunity")
-                    this.com.ownerId = userId()
-                    console.log(this.com)
-                    util.post("/contact/createCommunity", this.com).then(res => {
+                    this.com.ownerId = userId() // this.com 表示从【群】的数据中拿到 ownerId
+                    // console.log(this.com)
+                    util.post("/contact/createThread", this.com).then(res => {
                         console.log(res)
                         if (res.Code != 0) {
                             mui.toast(res.Msg)
                         } else {
                             //location.replace("localhost:8081")
                             //location.href = "/"
-                            mui.toast("建群成功")
-                            this.loadcommunitys();
-                            //goBack()
+                            mui.toast("✅ 建群成功")
+                            this.loadcommunitys(); // 👈 重新加载群列表
+                            //goBack() // 跳转到某个群
                         }
                     })
                 },
+				
+				// 更新用户信息
                 updateUserInfo() {
                     //console.log("createcommunity")
                     this.info.id = userId()

@@ -9,7 +9,7 @@ import (
 
 // 人员关系表
 type ContactBasic struct { // (contact_basic 这个 model 表示的是一组关系, owner_id 表示这个好友是谁的, target_id 好友是谁, 比如 24 是 3 owner 的好友)
-	gorm.Model
+	gorm.Model // 继承 Gorm
 	OwnerId  uint   // 关系拥有者 ID, 类型 uint 要与 MessageBasic 中的 FromId、ToId 一致
 	TargetId uint   // 关系的目标 ID, 类型 uint 要与 MessageBasic 中的 FromId、ToId 一致
 	Type     int    // 关系类型 (好友、群、关注、粉丝、黑名单)  => 用 1 2 3 来表示 (1: 好友, 2: 群组, 3: 黑名单), 后面可以扩展 4: 粉丝等等预留字段
@@ -20,6 +20,11 @@ type ContactBasic struct { // (contact_basic 这个 model 表示的是一组关�
 func (table *ContactBasic) TableName() string { // TableName 为数据表, 用于指定表名
 	return "contact_basic" // 在 db 中的表名
 }
+
+
+
+
+
 
 // 查找【某个人】的好友 (contact_basic 这个 model 表示的是一组关系, owner_id 表示这个好友是谁的, target_id 好友是谁, 比如 24 是 3 owner 的好友)
 // 也可以直接 SQL 查询  =>  SELECT * FROM `user_basic` WHERE id in (20,21) AND `user_basic`.`deleted_at` IS NULL

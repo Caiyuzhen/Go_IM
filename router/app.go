@@ -42,6 +42,9 @@ func Router() *gin.Engine { // 返回值 *gin.Engin e是一个指向 Gin 框架�
 	router.POST("/searchFriends", service.SearchFriends) // 查找好友的接口 => http://localhost:8081/SearchFriend => 参数为 userId=3
 	router.POST("/contact/addFriends", service.AddFriends)       // 添加好友的接口 => http://localhost:8081/addFriends
 
+	// 🧿 群模块
+	router.POST("/contact/createThread", service.CreateThreadServer) // 创建群的接口 => http://localhost:8081/contact/createThread
+
 	// 🌟 发送 websocket 消息 (Redis)
 	router.GET("/user/sendMsg", service.SendMsgServer)   // 访问在线测试工具: https://www.easyswoole.com/wstool.html  => 【ws://127.0.0.1:8081/user/sendMsg】
 	router.GET("/user/sendUserMsg", service.SendUserMsg) // 发送消息给指定用户 => 【ws://127.0.0.1:8081/user/sendUserMsg】

@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-// 🔥 分页的工具类（好友列表分页）
+// 🔥 返回响应的工具类
 type H struct {
 	Code int
 	Msg string
@@ -17,7 +17,7 @@ type H struct {
 
 
 
-// Resp 通用响应函数 (只返回字符串)
+// Resp 通用响应函数 (返回 json 数据)
 func Resp(w http.ResponseWriter, code int, data interface{}, msg string) {
 	fmt.Println("🚀🚀🚀 响应的数据", data)
 	// 设置响应的Content-Type为application/json
@@ -49,7 +49,7 @@ func Resp(w http.ResponseWriter, code int, data interface{}, msg string) {
 
 
 
-// RespList 表示请求处理成功 (返回列表数据)
+// RespList 表示请求处理成功 (返回数据)
 func RespList(w http.ResponseWriter, code int, data interface {}, total interface {}) {
 	// 设置响应的Content-Type为application/json
 	w.Header().Set("Content-Type", "application/json")
@@ -95,7 +95,7 @@ func RespOK(w http.ResponseWriter, data interface {}, msg string) {
 
 
 
-// RespOkList 表示请求处理成功 (需要返回列表数据)
+// RespOkList 表示请求处理成功 (需要返回数据)
 func RespOkList(w http.ResponseWriter, data interface {}, total interface {}) {
 	RespList(w, 0, data, total) // 传入 0 , 表示成功
 }

@@ -333,3 +333,27 @@ func AddFriends(c *gin.Context) {
 		utils.RespFail(c.Writer, msg) // 添加好友失败
 	}
 }
+
+
+
+// ——————————————————————————————————————————————————————————————————————————————————————————————
+
+
+
+//创建群的方法
+func CreateThreadServer(c *gin.Context) {
+	ownerId, _ := strconv.Atoi(c.PostForm("ownerId"))
+	threadName := c.PostForm("name")
+
+	thread := models.Thread{}
+	thread.OwnerId = uint(ownerId)
+	thread.Name = threadName
+
+	code, msg := models.CreateThread((thread))
+	if code == 0 {
+		utils.RespOK(c.Writer, code, msg) // 创建群成功
+	} else {
+		utils.RespFail(c.Writer, msg) // 创建群失败
+	}
+}
+

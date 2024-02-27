@@ -3,7 +3,7 @@ import "gorm.io/gorm"
 
 // 群信息表
 type GroupBasic struct {
-	gorm.Model
+	gorm.Model // 继承 Gorm
 	Name string // 群名称
 	OwnerId uint // 群主 ID
 	AvatarIcon string // 群头像

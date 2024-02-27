@@ -58,6 +58,11 @@
 `go run testGorm.go`
 
 
+## 新增一个 Model 表
+- 进入 Test 文件夹内
+  - 运行一下 testGorm.go, 新加一项目比如 db.AutoMigrate(&models.Thread{}) , 这样会在数据库中新增一个表
+
+
 ## 更新 Swap 文档（🌟 每次新增接口都需要 init 一下！）
 `swag init`
 
