@@ -9,20 +9,15 @@ import (
 
 // 群 Model
 type Thread struct {
-	gorm.Model // 继承 Gorm
-	Name string // 群名称
-	OwnerId uint // 群主 ID
-	Img string // 群头像
-	Desc string // 群描述
+	gorm.Model        // 继承 Gorm
+	Name       string // 群名称
+	OwnerId    uint   // 群主 ID
+	Img        string // 群头像
+	Desc       string // 群描述
 }
 
-
-
-
-
-
-// 创建群的普通房啊 -- 参数则是传入上面 类的实例
-func CreateThread(thread Thread) (int, string) {
+// 创建群的普通方法-- 参数则是传入上面 类的实例
+func CreateThread(thread Thread) (int, string) { // 返回 int 跟 string
 	if len(thread.Name) == 0 { // 群名称不能为空
 		return -1, "❌ 群名称不能为空"
 	}
@@ -38,4 +33,19 @@ func CreateThread(thread Thread) (int, string) {
 	}
 
 	return 0, "✅ 创建成功"
+}
+
+// 显示群列表
+func LoadThreadModel(ownerId uint) ([]*Thread, string) { // 返回 【群数据集合】 跟 【string】
+	threadData := make([]*UserBasic, 10)
+
+	// 去数据库中查询群列表
+	utils.DB.Find(&threadData)
+
+	// 遍历集合数据
+	for _, v := range threadData {
+		fmt.Println(v) // 打印集合数据
+	}
+
+	return 0, "✅ 群列表查询成功"
 }

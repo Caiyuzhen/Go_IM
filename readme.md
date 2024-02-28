@@ -3,10 +3,11 @@
 
 
 ## 在 Navicat 中建立 localhost 数据库
-- utf8mb4
+- 【字符集】utf8mb4
+- 【排序规则】utf8mb4_general_ci
 
 
-## 在 Navicat 中连接 mySQL 数据库
+## 在 Navicat 中连接 mySQL 数据库 (字符集选择 utf8mb4, 后续 config 的配置也要带上这个字符集)
 - ginChat
 - 123456
 
