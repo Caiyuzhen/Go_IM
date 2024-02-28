@@ -16,6 +16,7 @@ type Thread struct {
 	Desc       string // 群描述
 }
 
+
 // 创建群的普通方法-- 参数则是传入上面 类的实例
 func CreateThread(thread Thread) (int, string) { // 返回 int 跟 string
 	if len(thread.Name) == 0 { // 群名称不能为空
@@ -35,17 +36,58 @@ func CreateThread(thread Thread) (int, string) { // 返回 int 跟 string
 	return 0, "✅ 创建成功"
 }
 
-// 显示群列表
+
+// 显示群列表的方法
 func LoadThreadModel(ownerId uint) ([]*Thread, string) { // 返回 【群数据集合】 跟 【string】
-	threadData := make([]*UserBasic, 10)
+	// threadData := make([]*Thread, 10)
+	var findalThreads []*Thread // 存放用户所创建的群
+	var joinedThreads []Thread // 存放用户所加入的群
+	var contactBasics []ContactBasic
 
-	// 去数据库中查询群列表
-	utils.DB.Find(&threadData)
+	// // 首先，获取用户创建的所有群组  =>  去数据库中查询群列表
+	utils.DB.Where("owner_id=?", ownerId).Find(&findalThreads) // 查询条件是 ownerId, 也就是过滤出属于谁的群
 
-	// 遍历集合数据
-	for _, v := range threadData {
-		fmt.Println(v) // 打印集合数据
+
+	// 其次，获取用户加入的所有群组的关系记录
+	utils.DB.Where("owner_id=? AND type=?", ownerId, 2).Find(&contactBasics)
+	if len(contactBasics) > 0 { // 如果记录 > 0, 说明用户加入了某些群
+		for _, contact := range contactBasics {
+			var thread Thread
+			utils.DB.Where("id=?", contact.TargetId).First(&thread)
+			// fmt.Println(contact) // 打印群的集合数据
+			joinedThreads = append(joinedThreads, thread) // 把查询出来的群数据放到 threads 切片里边
+		}
 	}
 
-	return 0, "✅ 群列表查询成功"
+	// 将用户加入的群组添加到最终的群组列表中
+	for _, getJoinThread := range joinedThreads {
+		findalThreads = append(findalThreads, &getJoinThread)
+	}
+	return findalThreads, "✅ 群列表查询成功"
+}
+
+
+// 添加群组
+func JoinThreadModel(userId uint, threadId string) (int, string) {
+	contact := ContactBasic{} // 创建一个 ContactBasic 的实例
+	contact.OwnerId = userId
+	contact.Type = 2
+
+	thread := Thread{}
+
+	// 👇 通过 id 去查找群
+	utils.DB.Where("id=? or name=?", threadId, threadId).Find(&thread) // 🔥🔥【第一步】把 threadId 传入 thread 实例内
+	if thread.Name == "" {
+		return -1, "❌ 群不存在"
+	}
+
+	// 👇 通过 id、targetId、 类型 去判断是否加过群了
+	utils.DB.Where("owner_id=? and target_id=? and type=2", userId, threadId).First(&contact) // 通过数据库去查找某个人的群, 过滤出 contact
+	if !contact.CreatedAt.IsZero() { // 如果 contact.CreatedAt 不为空, 就说明已经加入过群了
+		return -1, "❌ 已经加入过群"
+	} else {
+		contact.TargetId = thread.ID // 🔥🔥【第二步】把查到的 threadId 传入到 contact 关系 model 里边  =>  建立 【哪个人 userId】 跟 【哪个群 threadId】 的关系  =>  【userId】 与 【threadId】
+		utils.DB.Create(&contact) // 创建一条数据, 表示【某个人】与【某个群】的关系 => 加群成功
+		return 0, "✅ 成功加入群聊"
+	}
 }

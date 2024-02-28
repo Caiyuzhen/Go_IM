@@ -349,14 +349,29 @@ func CreateThreadServer(c *gin.Context) {
 	}
 }
 
+
 // 显示群列表
 func LoadThreadServer(c *gin.Context) {
-	ownerId, _ := strconv.Atoi(c.PostForm("ownerId"))
+	ownerId, _ := strconv.Atoi(c.Request.FormValue("ownerId"))
 
-	code, msg := models.LoadThreadModel(uint(ownerId)) // ID 都是 uint
-	if code == 0 {
-		utils.RespOK(c.Writer, code, msg) // 查询群成功 （从数据库中捞出了群列表）
+	threadData, msg := models.LoadThreadModel(uint(ownerId)) // ID 都是 uint
+	if len(threadData) != 0 { // 如果有返回值
+		utils.RespList(c.Writer, 0, threadData, msg) // 查询群成功 （从数据库中捞出了群列表）
 	} else {
 		utils.RespFail(c.Writer, msg) // 查询群失败 （数据库中没有群）
+	}
+}
+
+
+// 加入某个群
+func JoinThreadServer(c *gin.Context) {
+	userId, _ := strconv.Atoi(c.Request.FormValue("userId"))
+	threadId := c.Request.FormValue("threadId")
+
+	data, msg := models.JoinThreadModel(uint(userId), threadId) // 传入用户 id 跟 群 id
+	if data == 0 {
+		utils.RespOK(c.Writer, data, msg) // 加入群成功
+	} else {
+		utils.RespFail(c.Writer, msg) // 加入群失败
 	}
 }

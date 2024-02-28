@@ -524,10 +524,12 @@
                         this.usermap = usermap;
                     }.bind(this))
                 },
+
+				// 👇 加载群聊
                 loadcommunitys: function () {
                     var that = this;
-                    post("contact/loadcommunity", { ownerId: userId() }, function (res) {
-                        that.communitys = res.Rows || [];
+                    post("contact/loadThread", { ownerId: userId() }, function (res) {
+                        that.communitys = res.Rows || []; // 👈后端返回的数据在 Rows 内
                     })
                 },
                 addfriend: function () {
@@ -632,7 +634,7 @@
                         this.setTimeFlag();
                         var that = this;
                         console.log(that);
-                        post("contact/joinGroup", { comId: dstobj, "userId": userId() }, function (res) {
+                        post("contact/joinThread", { threadId: dstobj, "userId": userId() }, function (res) {
                             if (res.Code == 0) {
                                 mui.toast("添加成功");
 
@@ -643,6 +645,8 @@
                         })
                     }
                 },
+
+				// 👇 加入群聊
                 joincom: function () {
                     var that = this;
                     mui.prompt('', '请输入群号或者群名称', '加群', ['取消', '确认'], function (e) {
