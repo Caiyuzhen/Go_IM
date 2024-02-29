@@ -107,3 +107,17 @@ func AddFriend(userId uint, targetId uint) (int, string) { // 返回数字 + 字
 
 	return -1, "❌ 好友 ID 不能为空" // 如果没有传入 targetId, 就返回 -1
 }
+
+
+
+// 👥 通过群来找到人的 ID
+func SearchUserByGroupId(threadId uint) []uint {
+	contacts := make([]ContactBasic, 0)
+	objIds := make([]uint, 0)
+	utils.DB.Where("target_id = ? and type=2", threadId).Find(&contacts)
+	for _, v := range contacts {
+		objIds = append(objIds, uint(v.OwnerId)) // 把好友的 ID 存储到 objIDS 切片中
+	}
+	return objIds
+}
+

@@ -48,6 +48,7 @@
 - go get github.com/asaskevich/govalidator
   - 检验账号跟密码等格式的库
 - go get github.com/redis/go-redis/v9
+- go get github.com/go-redis/redis/v8
   - 👍 引入百万级消息并发的缓存库, 用于缓存用户信息, 安装后需要在 config 的 app.yml 内配置 redis 的连接信息
 - go get github.com/gorilla/websocket
   - 使用 websocket 来实现聊天功能
