@@ -83,7 +83,7 @@
                 msgcontext: {
                     TargetId: -1,
                     Type: -1,
-                    CreateTime: new Date().getTime(),
+                    CreateTime: new Date().getTime(), // 👈👈 创建时间（前端没有刷新页面, 时间就不会变, 因此这个时间戳应该由后端给到, 前端预留口子）
                     userId: userId()
                 },
                 plugins: [
@@ -333,7 +333,7 @@
                         this.setTimeFlag()
 						// 👇 传入消息 id, 用户 id 等信息
                         //{id:1,userid:2,dstid:3,cmd:10,media:1,content:"hello"}
-                        var msg = this.createmsgcontext();
+                        var msg = this.createmsgcontext(); // 👈 创建消息结构
                         msg.Media = 1;
                         msg.Content = txt; // 传入具体的消息
                         if (msg.Type == 1) {

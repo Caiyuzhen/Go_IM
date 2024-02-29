@@ -1,8 +1,20 @@
 mysql: 
-  dns: root:123456@tcp(127.0.0.1:3306)/ginChat?charset=utf8mb4&parseTime=True&loc=UTC
+  dns: root:123456@tcp(127.0.0.1:3306)/ginChat?charset=utf8mb4&parseTime=True&loc=UTC # 连接数据库的地址
+
 redis:
   Addr: "127.0.0.1:6379"
   PassWord: ""
   DB: 0
   PoolSize: 30
   MinIdleConns: 30
+
+timeout:
+  DelayHeartbeat: 10 # 延迟心跳时间, 单位秒
+  HeartbeatHz: 30 # 每隔多少 s 心跳时间
+  HearbeatMaxTime: 100000 # 最大心跳时间, 超过此就下线
+  RedisOnlineTime: 4 # 缓存的在线用户时长, 单位 H
+
+port: # 📢 在 message_model 内的 udpReceiveProc_Podcast ｜ udpSendProc_Podcast 两个广播方法中用到
+  server: ":8081" # 服务地址
+  udpIP: "192, 168, 0, 255"
+  udpPort: 3001 # dup 端口, 即时通讯

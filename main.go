@@ -4,6 +4,8 @@ import (
 	// "github.com/gin-gonic/gin"
 	"ginchat/router"
 	"ginchat/utils"
+
+	"github.com/spf13/viper"
 )
 
 func main() { // utils 初始化 => route => model => service => ...
@@ -14,7 +16,8 @@ func main() { // utils 初始化 => route => model => service => ...
 
 	// 代码分层后的方式 ________________________________________________
 	router := router.Router()
-	router.Run(":8081") // listen and serve on localhost:8080 端口
+	router.Run(viper.GetString("port.server")) // 8081 端口 -> 🌟 配置在 app.yml 内
+	// router.Run(":8081") // listen and serve on localhost:8081 端口 (写死的端口)
 
 	// 【代码没有分层的方式】建立一個 gin 的router 的示例 ________________________________________________
 	// router := gin.Default()
