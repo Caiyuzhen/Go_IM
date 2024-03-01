@@ -19,7 +19,6 @@ import (
 	"gorm.io/gorm"
 )
 
-
 // 消息结构体 => 定义后可以去 testGorm.go 中去生成一张表
 type MessageBasic struct {
 	gorm.Model        // 继承 Gorm
@@ -36,34 +35,27 @@ type MessageBasic struct {
 	CreateTime uint64 // 创建时间
 }
 
-
-
 // ⚠️ => 类方法, 从数据库中获取表名的方法
 func (table *MessageBasic) TableName() string { // TableName 为数据表, 用于指定表名
 	return "message_basic" // 在 db 中的表名
 }
 
-
 // 🚀 关系节点的结构体, 包含用户关系、消息数据以及群组 ——————————————————————————————————————————————————————————————————————————————————————————————————————————————
 type Node struct {
-	Conn      *websocket.Conn // 🚀 客户端的 WebSocket 连接, 用于与客户端通信  => 用户的连接数据, 用于发送消息, 知道要发送给谁
+	Conn          *websocket.Conn // 🚀 客户端的 WebSocket 连接, 用于与客户端通信  => 用户的连接数据, 用于发送消息, 知道要发送给谁
 	Addr          string          //客户端地址
 	FirstTime     uint64          //首次连接时间
-	HeartbeatTime uint64      // 💗 用户的心跳时间
+	HeartbeatTime uint64          // 💗 用户的心跳时间
 	LoginTime     uint64          //登录时间
-	DataQueue chan []byte     // 🔥 消息 (一个管道, 用于存放待发送给客户端的消息)
-	GroupSets set.Interface   // ⚡️  好友 / 群 => 使用 set 库存储该客户端所加入的群组的集合, 可以构造更安全的线程
+	DataQueue     chan []byte     // 🔥 消息 (一个管道, 用于存放待发送给客户端的消息)
+	GroupSets     set.Interface   // ⚡️  好友 / 群 => 使用 set 库存储该客户端所加入的群组的集合, 可以构造更安全的线程
 }
-
-
 
 // 🔥  存放映射关系（绑定用户 ID 和 Node）的全局变量  =>  存储所有连接到服务器的客户端节点, 键是客户端的唯一标识符（如用户 ID），值是对应的 Node 结构体实例
 var clientMap map[int64]*Node = make(map[int64]*Node, 0) // 用于存储用户的连接信息
 
-
 // 读写锁
 var rwLocker sync.RWMutex // 读写锁
-
 
 // 【🔥🔥 聊天需要的字段 - 前端需要发送（发送者 ID、接收者 ID 、消息类型、发送的内容、登录 token 校验）】聊天室的总的公共方法(处理客户端连接请求的函数, 当客户端尝试建立 WebSocket 连接时会创建一个 Node 实例, 将其添加到 clientMap 中, 并启动发送（sendProc）和接收（receiveProc）协程) => 单聊、群聊、广播都需要获取一些参数等等 -> 发送消息, 需要 【发送者 ID】、【接收者 ID】、【消息类型】、【消息内容】
 func Chat(writer http.ResponseWriter, request *http.Request) {
@@ -72,9 +64,9 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 
 	// 获取 Chat 路由内的参数
 	// token := query.Get("token")
-	Id := query.Get("userId")                   // 是 string 类型, 但是上面的 clientMap 是 int64 类型, 因此需要转换一下数据格式
+	Id := query.Get("userId")                 // 是 string 类型, 但是上面的 clientMap 是 int64 类型, 因此需要转换一下数据格式
 	userId, _ := strconv.ParseInt(Id, 10, 64) // 10 表示十进制, 64 表示 int64 类型
-	isValida := true // 临时变量, 用于校验参数是否合法, 后续传入数据库进行校验 checkToken(token)
+	isValida := true                          // 临时变量, 用于校验参数是否合法, 后续传入数据库进行校验 checkToken(token)
 
 	//【☝️第二步】升级为 websocket 并校验请求来源, 防止跨域攻击
 	conn, err := (&websocket.Upgrader{
@@ -92,12 +84,12 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 	//【☝️第三步】初始化 node 来获取用户关系 Conn
 	currentTime := uint64(time.Now().Unix())
 	node := &Node{
-		Conn:      conn,                    // 客户端的 WebSocket 连接, 用于与客户端通信
+		Conn:          conn,                       // 客户端的 WebSocket 连接, 用于与客户端通信
 		Addr:          conn.RemoteAddr().String(), //客户端地址
-		LoginTime:     currentTime,       //首次连接时间
-		HeartbeatTime: currentTime,    // 💗 用户的心跳时间
-		DataQueue: make(chan []byte, 50),   //  一个管道, 用于存放待发送给客户端的数据 => 初始化 50 个消息
-		GroupSets: set.New(set.ThreadSafe), //  一个集合, 用于存储该客户端所加入的群组 => 初始化一个线程安全的 set 集合
+		LoginTime:     currentTime,                //首次连接时间
+		HeartbeatTime: currentTime,                // 💗 用户的心跳时间
+		DataQueue:     make(chan []byte, 50),      //  一个管道, 用于存放待发送给客户端的数据 => 初始化 50 个消息
+		GroupSets:     set.New(set.ThreadSafe),    //  一个集合, 用于存储该客户端所加入的群组 => 初始化一个线程安全的 set 集合
 	}
 
 	//【☝️第四步】判断用户关系
@@ -112,7 +104,7 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 
 	//【☝️第七步】调用消息的接收方法（发送方也会接收到自己发送的消息）
 	// go receiveProc_websocketMsg_Personal(node)   // 接收消息的协程
-	
+
 	// 👇【Redis 缓存】把在线用户的消息加到缓存中
 	SetUserOnlineInfo("online_"+Id, []byte(node.Addr), time.Duration(viper.GetInt("timeout.RedisOnlineTime"))*time.Hour)
 	// sendMsg_Podcast(userId, []byte("🚀 欢迎加入聊天室")) // 连接后, 默认给前端发送一条消息
@@ -130,9 +122,8 @@ func Chat(writer http.ResponseWriter, request *http.Request) {
 	sendMsg_Podcast 						🌟 拿到前端发来的消息, 存入管道
 */
 
-
-
 // 👇 发送消息的具体方法  ——————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//
 //	(🌟  第四步) 发送【websocketMsg_Persona 双向消息】的方法 (从管道中取出数据) => 这条调用了后, 接收方（对方）才能收到消息!
 func sendProc_websocketMsg_Personal(node *Node) {
 	for {
@@ -148,8 +139,6 @@ func sendProc_websocketMsg_Personal(node *Node) {
 		}
 	}
 }
-
-
 
 // (🌟 第一步) 接收【websocketMsg_Persona 双向消息】的方法（发送方也会接收到自己发送的消息, 接收到数据后可以广播给其他地方）
 func receiveProc_websocketMsg_Personal(node *Node) {
@@ -169,27 +158,22 @@ func receiveProc_websocketMsg_Personal(node *Node) {
 			currentTime := uint64(time.Now().Unix())
 			node.UpdateUserHeartbeat(currentTime)
 		} else {
-			dispatchMsg_Podcast(data) // 分发消息
+			dispatchMsg_Podcast(data)   // 分发消息
 			broadCastMsg_BeenSave(data) // 🔥 把消息保存到
 			fmt.Println("✅ 【第一步】接收(自己发送的)消息并保存到管道成功 (receiveProc_websocketMsg_Personal) >>> ", string(data))
 		}
 	}
 }
 
-
 // 🌟 全局变量, 用来保存消息的方法 => 然后可以在下面的广播消息中进行调用
 var udpSendChan_SaveMsg chan []byte = make(chan []byte, 1024) // 用于存放消息的管道, 1024 表示最多存放 1024 个消息
-
 
 // 进行消息保存的方法 (写入管道)
 func broadCastMsg_BeenSave(data []byte) {
 	udpSendChan_SaveMsg <- data // 把数据加入管道, 然后再去给下面的 📢 广播消息 进行发送
 }
 
-
-
 // ************************************************************************************************************************************************
-
 
 // 【初始化广播协程, 自动执行】Go 语言会在程序启动时自动执行该（🌟 初始化函数）。在这里，它用于启动处理 UDP 📢 广播消息发送（udpSendProc）和 📢接收广播消息（udpReceiveProc）的协程（数据的发送与接收读取） ——————————————————————————————————————————————————————————————————————————————————————————————————————————————
 func init() {
@@ -197,7 +181,6 @@ func init() {
 	go udpReceiveProc_Podcast() // 调度接收消息的协程
 	fmt.Println("✅ 消息协程初始化完成...")
 }
-
 
 // 【📢 广播消息到局域网内的方法】用于处理 UDP 广播消息的发送, 从 udpSendChan 通道中读取消息, 并通过 UDP 协议将这些消息广播到局域网内
 func udpSendProc_Podcast() { // 👈 也可以用来广播群消息
@@ -213,7 +196,7 @@ func udpSendProc_Podcast() { // 👈 也可以用来广播群消息
 	defer con.Close() // 关闭连接, 避免内存泄漏
 	for {
 		select {
-		case data := <- udpSendChan_SaveMsg: // 🌟 从广播到局域网内的消息内【取出数据】
+		case data := <-udpSendChan_SaveMsg: // 🌟 从广播到局域网内的消息内【取出数据】
 			fmt.Println("广播消息到局域网 (udpSendProc_Podcast) >>>>>> ", string(data))
 			_, err := con.Write(data) // 写入消息
 			if err != nil {
@@ -223,8 +206,6 @@ func udpSendProc_Podcast() { // 👈 也可以用来广播群消息
 		}
 	}
 }
-
-
 
 // 【📢 接收广播消息】, 责监听 UDP 广播消息, 当局域网内有消息广播时, 这个协程会接收到这些消息并进行获取
 func udpReceiveProc_Podcast() { // 👈 也可以用来广播群消息
@@ -251,14 +232,12 @@ func udpReceiveProc_Podcast() { // 👈 也可以用来广播群消息
 	}
 }
 
-
-
 // (🌟 第三步) 拿到前端发来的消息, 存入管道
 func sendMsg_Podcast(userId int64, msg []byte) { // 传入 userId 和 msg
 	// // 👇 之前发送消息的方法
 	fmt.Println("🚀 【第三步】后台发送消息了 (sendMsg_Podcast) >>>>>> 消息发送者: ", userId, " 消息内容:", string(msg))
 
-	rwLocker.RLock() // 加锁 => 读锁
+	rwLocker.RLock()              // 加锁 => 读锁
 	node, ok := clientMap[userId] // 获取用户的连接信息, 用于发送消息
 
 	// 【⭕️ zRedis 缓存 - 第一步】 前期处理, 消息序列化等工作
@@ -303,24 +282,20 @@ func sendMsg_Podcast(userId int64, msg []byte) { // 传入 userId 和 msg
 
 	// // 👇 之前发送消息的方法
 	// rwLocker.RUnlock()            // 解锁 => 读锁
-	// if ok {
-	// 	node.DataQueue <- msg // 把消息加入管道, 然后给下面的 sendProc_websocketMsg_Personal 进行判断, 如果是单聊消息则发送给对应的用户
-	// }
+	if ok {
+		node.DataQueue <- msg // 把消息加入管道, 然后给下面的 sendProc_websocketMsg_Personal 进行判断, 如果是单聊消息则发送给对应的用户
+	}
 }
-
-
 
 // 将 msg 转为 byte 类型 (🌟 类方法)
 func (msg MessageBasic) MarshalBinary() ([]byte, error) {
 	return json.Marshal(msg)
 }
 
-
-
 // 👀 获取缓存里边的消息
 func RedisMsgModel(userIdA int64, userIdB int64, start int64, end int64, isRevRange bool) []string {
 	rwLocker.RLock()
-	// node, _ := clientMap[userIdA]
+	node, ok := clientMap[userIdA]
 	rwLocker.RUnlock()
 
 	ctx := context.Background()
@@ -346,19 +321,17 @@ func RedisMsgModel(userIdA int64, userIdB int64, start int64, end int64, isRevRa
 		fmt.Println("❌ 没有找到 Redis 消息缓存", err)
 	}
 
-	// 找到了缓存消息的话, 则进行循环
-	// if (ok) { // 避免无消息的情况
-	// 	for _, value := range rels {
-	// 		fmt.Println("✅ 找到了缓存消息, 正在发送给 >>> userID: ", userIdA, "消息内容是: ", value)
-	// 		node.DataQueue <- []byte(value)
-	// 	}
-	// } else {
-	// 	fmt.Println("❌ 登录过期 (或未登录)")
-	// }
+	// 如果登录了, 且找到了缓存消息的话, 则进行循环
+	if (ok) { // 避免无消息的情况
+		for _, value := range rels {
+			fmt.Println("✅ 找到了缓存消息, 正在发送给 >>> userID: ", userIdA, "消息内容是: ", value)
+			node.DataQueue <- []byte(value)
+		}
+	} else {
+		fmt.Println("❌ 登录过期 (或未登录)")
+	}
 	return rels
 }
-
-
 
 // 💗 更新用户的心跳时间 (🔥类方法)
 func (node *Node) UpdateUserHeartbeat(currentTime uint64) {
@@ -366,16 +339,14 @@ func (node *Node) UpdateUserHeartbeat(currentTime uint64) {
 	return
 }
 
-
 // 检测用户心跳是否超时 (🔥类方法)
 func (node *Node) IsHeartbeatTimeOut(currentTime uint64) (timeout bool) { // 返回 timeout 这个参数（ bool 类型）
-	if node.HeartbeatTime + viper.GetUint64("heartbeat.timeout") < currentTime { // ⚡️ app.yml 内配置的超时时间
+	if node.HeartbeatTime+viper.GetUint64("heartbeat.timeout") < currentTime { // ⚡️ app.yml 内配置的超时时间
 		fmt.Println("🛜 检测到心跳超时了, 即将关闭 socket 连接...", node)
 		timeout = true
 	}
 	return
 }
-
 
 // 🧹 清理超时连接
 func CleanConnection(param interface{}) (result bool) {
@@ -387,7 +358,7 @@ func CleanConnection(param interface{}) (result bool) {
 	}()
 	currentTime := uint64(time.Now().Unix())
 	for i := range clientMap { // 表示遍历 clientMap, 用于清理超时连接
-		node := clientMap[i] 
+		node := clientMap[i]
 		if node.IsHeartbeatTimeOut(currentTime) {
 			fmt.Println("💔 心跳超时, 已关闭 socket 连接...", node)
 			node.Conn.Close() // 关闭连接
@@ -396,8 +367,7 @@ func CleanConnection(param interface{}) (result bool) {
 	return result
 }
 
-
-// 🚀 群发消息的方法 
+// 🚀 群发消息的方法
 func sendGroupMsg(targetId int64, msg []byte) {
 	fmt.Println("✈️ 开始群发消息")
 	userIds := SearchUserByGroupId(uint(targetId)) // 根据群内的用户 id 找到用户
@@ -409,17 +379,17 @@ func sendGroupMsg(targetId int64, msg []byte) {
 	}
 }
 
-
 // (🌟 第二步)【把消息转发给谁的 (调度）】=> 判断要把拿到的局域网消息分发消息到【单聊】、【群聊】还是【系统消息】等, 看业务需求******************************************************************
 func dispatchMsg_Podcast(data []byte) {
+	fmt.Println("⚠️⚠️ 到这一步了")
 	// testData := []byte(`{"FromId": 1, "TargetId": 2, "Type": 1, "Content": "测试消息"}`)
-	msg := MessageBasic{}             // 初始化消息结构体
+	msg := MessageBasic{}                      // 初始化消息结构体
 	msg.CreateTime = uint64(time.Now().Unix()) // 拿到时间戳
-	err := json.Unmarshal(data, &msg) // 解析数据, 因为 data 是二进制数据, 需要解析成结构体
+	err := json.Unmarshal(data, &msg)          // 解析数据, 因为 data 是二进制数据, 需要解析成结构体
 	if err != nil {
 		fmt.Println("❌ 解析 JSON 消息失败", err)
 		return
-} 	else {
+	} else {
 		fmt.Println("✅ 【第二步】解析静态JSON成功", msg)
 	}
 	// 首先检查数据是否为有效的 JSON 格式
