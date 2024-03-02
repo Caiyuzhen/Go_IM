@@ -378,15 +378,13 @@ func JoinThreadServer(c *gin.Context) {
 
 
 
-// 【👇 用 Redis 缓存消息】——————————————————————————————————————————————————————————————————————————————————————————————
-
-
+// 【👇 获取 Redis 内的缓存消息】—————————————————————————————————————————————————————————————————————————————————————————————
 func RedisMsgServer(c *gin.Context) {
 	userIdA, _ := strconv.Atoi(c.PostForm("userIdA"))
 	userIdB, _ := strconv.Atoi(c.PostForm("userIdB"))
 	start, _ := strconv.Atoi(c.PostForm("start"))
 	end, _ := strconv.Atoi(c.PostForm("end"))
 	isRev, _ := strconv.ParseBool(c.PostForm("isRev"))
-	res := models.RedisMsgModel(int64(userIdA), int64(userIdB), int64(start), int64(end), isRev)
+	res := models.RedisMsgModel(int64(userIdA), int64(userIdB), int64(start), int64(end), isRev) // Model 层
 	utils.RespOkList(c.Writer, "ok", res)
 }

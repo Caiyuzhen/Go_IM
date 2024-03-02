@@ -27,11 +27,12 @@ var (
 func InitConfig() { // 🌟 用 viper 读取配置文件内的流式数据, viper 为 GORM 内置的方法, 用于读取配置文件
 	viper.SetConfigName("app") // 设置配置文件名的名称 (不带后缀)
 	viper.AddConfigPath("config") // 设置配置文件的路径 => ginChat 是项目的根目录
+	viper.SetConfigType("yml") // 设置配置文件的类型
 	err := viper.ReadInConfig() // 读取配置文件
 	if err != nil {
 		fmt.Printf("❌ viper read config failed, err: %v\n", err)
 	}
-	fmt.Println("⚙️ 正在初始化 mySQL 的配置文件...")
+	fmt.Println("⚙️ 正在初始化 yml 配置文件...")
 	fmt.Println("✅ viper 读取到了 config 的配置文件(数据库路由): ", viper.Get("mysql")) // 打印得到的内容 => map[dns:root:123456@tcp(127.0.0.1:3306)/ginChat?charset=utf8mb4&parseTime=True&loc=UTC]
 }
 
@@ -105,7 +106,7 @@ func InitRedis() {
 	if err != nil {
 		fmt.Printf("❌ Redis 数据库初始化失败...: %v\n", err)
 	} else {
-		fmt.Printf("✅ Redis 数据库初始化成功...: %v\n", pong)
+		fmt.Printf("🔴 Redis 数据库初始化成功...: %v\n", pong)
 	}
 }
 

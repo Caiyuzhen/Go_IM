@@ -17,4 +17,4 @@ timeout:
 port: # 📢 在 message_model 内的 udpReceiveProc_Podcast ｜ udpSendProc_Podcast 两个广播方法中用到
   server: ":8081" # 服务地址
   udpIP: "192, 168, 0, 255"
-  udpPort: 3001 # dup 端口, 即时通讯
+  udpPort: 3000 # dup 端口, 即时通讯
