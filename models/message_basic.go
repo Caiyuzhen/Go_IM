@@ -317,7 +317,6 @@ func sendMsg_ToME(TargetId int64, originalMsg []byte) { // 传入 userId 和 msg
 	}
 	// fmt.Println("🌟🌟🌟 测试: ", "userIdStr:", userIdStr, "targetIdStr:", targetIdStr) // 打印检查
 
-
 	// 【⭕️ zRedis 缓存 - 2】 真正去做消息的缓存
 	res2, err2 := utils.RedisDB.ZRevRange(ctx, key, 0, -1).Result() // 先查询下缓存的消息, 看下怎么排序
 	if err2 != nil {
@@ -357,8 +356,8 @@ func sendGroupMsg(targetId int64, msg []byte) {
 	fmt.Println("✈️ 开始群发消息")
 	userIds := SearchUserByGroupId(uint(targetId)) // 根据群内的用户 id 找到用户
 	for i := 0; i < len(userIds); i++ {
-		if targetId != int64(userIds[i]) { // 排除给自己消息
-			sendMsg_ToME(int64(userIds[i]), msg)
+		if targetId != int64(userIds[i]) { // 排除给自己的消息
+			sendMsg_ToME(int64(userIds[i]), msg) // 👈这里没写完, 逻辑上应该群发而不是发给所有人
 		}
 	}
 }

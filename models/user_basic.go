@@ -13,6 +13,7 @@ import (
 type UserBasic struct {
 	gorm.Model // 继承 gorm.Model, 继承后可以使用 gorm.Model 的属性
 	Identity string // 唯一标识
+	Avatar string // 头像
 	Name string // 用户名
 	Password string // 密码
 	Phone string `valid:"matches(^1[3-9]{1}\\d{9}$)"`// 手机号 => 使用 ValidateStruct 进行校验
@@ -117,6 +118,7 @@ func UpdateUser(user UserBasic) *gorm.DB { // 返回 DB 内的用户数据
 		Phone: user.Phone,
 		Email: user.Email,
 		Salt: user.Salt,
+		Avatar: user.Avatar,
 	})
 }
 

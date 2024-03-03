@@ -161,6 +161,7 @@ func UpdateUser(c *gin.Context) { // 处理路由的数据 => 获取用户列表
 	// user.Password = c.PostForm("password") // 获取路由中的 password 参数 => PostForm 是 gin 框架的方法
 	user.Phone = c.PostForm("phone") // 获取路由中的 phone 参数 => PostForm 是 gin 框架的方法
 	user.Email = c.PostForm("email") // 获取路由中的 email 参数 => PostForm 是 gin 框架的方法
+	user.Avatar = c.PostForm("icon") // 获取路由中的 icon 参数 => PostForm 是 gin 框架的方法
 
 	// 生成新的盐值和加密密码 ————————————————————
 	plainPassword := c.PostForm("password")                      // 获取前端传来的原始密码
@@ -249,7 +250,7 @@ func FindUserByNameAndPassword(c *gin.Context) { // 处理用户登录的路由�
 
 // 👇Redis 的消息通讯功能 ————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 // 防止跨域站点的伪造请求（跨域攻击 => CSRF 攻击)
-var upGrade = websocket.Upgrader{
+var upGrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { // CheckOrigin 函数用于检查和验证请求的来源是否合法
 		return true
 	},
@@ -257,7 +258,7 @@ var upGrade = websocket.Upgrader{
 
 // 开启 WebSocket 服务来发送消息的方法
 func SendMsgServer(ctx *gin.Context) {
-	ws, err := upGrade.Upgrade(ctx.Writer, ctx.Request, nil) // 将普通的 HTTP 请求升级为 WebSocket 请求, Upgrade 为 gorilla/websocket 包内的方法
+	ws, err := upGrader.Upgrade(ctx.Writer, ctx.Request, nil) // 将普通的 HTTP 请求升级为 WebSocket 请求, Upgrade 为 gorilla/websocket 包内的方法
 	if err != nil {
 		fmt.Println("❌ Http 请求升级为 WebSocket 失败: ", err)
 		return
@@ -270,11 +271,12 @@ func SendMsgServer(ctx *gin.Context) {
 		}
 	}(ws)
 
-	MsgHandler(ws, ctx)
+	MsgHandler(ctx, ws)
 }
 
+
 // 工具函数, 用于调用 utils 内操作 redis 数据库的方法 (🔥 发布消息到管道, 此时客户端就可以订阅这个方法)
-func MsgHandler(ws *websocket.Conn, ctx *gin.Context) {
+func MsgHandler(ctx *gin.Context, ws *websocket.Conn) {
 	for {
 		msg, err := utils.SubMsgToRedis(ctx, utils.PublishKey) // PublishKey 是一个管道
 		if err != nil {
@@ -293,9 +295,11 @@ func MsgHandler(ws *websocket.Conn, ctx *gin.Context) {
 }
 
 // 发送单聊的方法
-func SendUserMsg(c *gin.Context) {
+func SendUserMsgServer(c *gin.Context) {
 	models.Chat(c.Writer, c.Request)
 }
+
+
 
 // 【👇 用户关系的方法】——————————————————————————————————————————————————————————————————————————————————————————————
 
@@ -336,10 +340,14 @@ func AddFriends(c *gin.Context) {
 func CreateThreadServer(c *gin.Context) {
 	ownerId, _ := strconv.Atoi(c.PostForm("ownerId"))
 	threadName := c.PostForm("name")
+	threadAvatar := c.PostForm("icon")
+	desc := c.PostForm("desc") // 群描述
 
 	thread := models.Thread{}
 	thread.OwnerId = uint(ownerId)
 	thread.Name = threadName
+	thread.Img = threadAvatar // 群头像
+	thread.Desc = desc
 
 	code, msg := models.CreateThread((thread))
 	if code == 0 {

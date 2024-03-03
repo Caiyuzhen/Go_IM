@@ -115,6 +115,8 @@ func SearchUserByGroupId(threadId uint) []uint {
 	contacts := make([]ContactBasic, 0)
 	objIds := make([]uint, 0)
 	utils.DB.Where("target_id = ? and type=2", threadId).Find(&contacts)
+	// 拿到了群 id 跟 群 好友的 id
+	fmt.Println("🌟 查到了群的好友:", contacts, "群的 ID:", threadId)
 	for _, v := range contacts {
 		objIds = append(objIds, uint(v.OwnerId)) // 把好友的 ID 存储到 objIDS 切片中
 	}

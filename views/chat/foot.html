@@ -41,14 +41,14 @@
                 usermap: {},
                 friends: [],
                 communitys: [],
-                profile: {
+                profile: { // 👈 用户的数据结构
                     avatar: "",
                     nickname: "",
                     memo: "",
                 },
                 webSocket: {},
                 win: "main",
-                com: {
+                com: { // 👈 群的数据结构
                     "ownerId": "",
                     "icon": "",
                     "cate": "",
@@ -415,7 +415,7 @@
                             deceleration: 0.0006, //阻尼系数,系数越小滑动越灵敏
                             bounce: true //是否启用回弹
                         });
-						
+
                         // 👇下拉获取历史消息记录
                         document.querySelector('.mui-scroll-wrapper').addEventListener('scroll', (e) => {
                             let translate = e.target.style?.transform?.match(/translate3d\(\d+px,\s*(\d+)px,\s*(\d+)px\)/i);

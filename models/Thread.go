@@ -82,7 +82,7 @@ func JoinThreadModel(userId uint, threadId string) (int, string) {
 	}
 
 	// 👇 通过 id、targetId、 类型 去判断是否加过群了
-	utils.DB.Where("owner_id=? and target_id=? and type=2", userId, threadId).First(&contact) // 通过数据库去查找某个人的群, 过滤出 contact
+	utils.DB.Where("owner_id=? and target_id=? and type=2", userId, threadId).Find(&contact) // 通过数据库去查找某个人的群, 过滤出 contact
 	if !contact.CreatedAt.IsZero() { // 如果 contact.CreatedAt 不为空, 就说明已经加入过群了
 		return -1, "❌ 已经加入过群"
 	} else {

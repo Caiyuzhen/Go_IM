@@ -52,6 +52,6 @@ func Router() *gin.Engine { // 返回值 *gin.Engin e是一个指向 Gin 框架�
 
 	// 🌟 发送 websocket 消息
 	router.GET("/user/sendMsg", service.SendMsgServer)   // 访问在线测试工具: https://www.easyswoole.com/wstool.html  => 【ws://127.0.0.1:8081/user/sendMsg】
-	router.GET("/user/sendUserMsg", service.SendUserMsg) // 发送单聊消息 => 【ws://127.0.0.1:8081/user/sendUserMsg】
+	router.GET("/user/sendUserMsg", service.SendUserMsgServer) // 发送单聊消息 => 【ws://127.0.0.1:8081/user/sendUserMsg】
 	return router
 }
