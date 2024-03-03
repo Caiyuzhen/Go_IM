@@ -214,7 +214,7 @@ func udpReceiveProc_Podcast() { // 👈 也可以用来广播群消息
 		var buf [512]byte
 		n, err := con.Read(buf[0:]) // 读取管道中的消息数据
 		if err != nil {
-			fmt.Println("❌ 接收广播消息失败 (udpReceiveProc_Podcast)", err)
+			fmt.Println("❌ 读取管道消息失败", err)
 			return
 		}
 		fmt.Println("接收到了局域网内的广播消息 (udpReceiveProc_Podcast) >>>>>> ", string(buf[0:n]))
